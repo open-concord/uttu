@@ -2,13 +2,13 @@
 
 Session Create_socket(std::optional<const char*> target_ip, unsigned short port, unsigned short queue_limit=5) {
   // TODO: actually check system max
-  (queue_limit>=5) ? error("QUEUE_LIMIT MUST BE LESS THAN OR EQUAL TO 5"); // error checking
+  if(queue_limit>=5) {error("QUEUE_LIMIT MUST BE LESS THAN OR EQUAL TO 5");} // [ERROR]
   // initial setup
   session s = new Session(port, queue_limit);
   struct sockaddr_in _self;
 
   int sockfd = socket(AF_INET, SOCK_STREAM, 0); // create socket
-  (sockfd<0) ? error("COULD NOT OPEN"); // error checking
+  if(sockfd<0) {error("COULD NOT OPEN");} // [ERROR]
   bzero((char*) &_self, sizeof(_self)); // zeroing out self_addr buffer
 
   // sockaddr config(s)
@@ -21,7 +21,7 @@ Session Create_socket(std::optional<const char*> target_ip, unsigned short port,
     sockfd,
     (struct sockaddr*) &_self,
     sizeof(_self)
-  ) <0) {error("COULD NOT BIND")}
+  ) <0) {error("COULD NOT BIND");} // [ERROR]
 
   listen(sockfd, queue_limit);
   s.sockfd = sockfd;
@@ -38,7 +38,7 @@ Peer* Session::Acceptor(bool(*criteria)(const char*)) {
       (struct sockaddr*) &_peer,
       &_peerlen
     );
-    if (_peerfd<0) {error("COULD NOT ACCEPT");}
+    if (_peerfd<0) {error("COULD NOT ACCEPT");} // [ERROR]
     if (criteria(_peer->sin_addr)) {
       Peer p = new Peer(_peerfd, _peer);
       return p;
@@ -50,7 +50,7 @@ Peer* Session::Acceptor(bool(*criteria)(const char*)) {
 }
 
 void Session::Close() {
-  this->done = true;
+  this->close = true;
 }
 
 void Peer::Set_Handler(char* (*hnd)(Peer*)) {
@@ -61,10 +61,10 @@ void Peer::Start() {
   int n; // error status
   bzero(this->buff, 256); // zero out buffer
   n = read(this->sockfd, this->buff, 255);
-  if (n<0) {error("COULD NOT READ");}
+  if (n<0) {error("COULD NOT READ");} // [ERROR]
   char* ret = this->handler(this);
   n = write(this->sockfd, ret, sizeof(ret));
-  if (n<0) {error("COULD NOT WRITE");}
+  if (n<0) {error("COULD NOT WRITE");} // [ERROR]
   if (this->done) {close(this->sockfd);}
   this.~Peer();
 }
