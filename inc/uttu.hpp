@@ -3,16 +3,24 @@
 
 #endif
 #ifdef __linux__ // linux and linux based
-  #include <sys/types.h> // needed by socket.h
   #include <sys/socket.h> // duh
+  #include <sys/types.h> // needed by socket.h
   #include <netinet/in.h> // internet socket protocol
+  #include <strings.h> // bzero
+  #include <unistd.h> // close, accept, etc
+  #include <arpa/inet.h> // needed for ip ID
 #endif
-#ifdef _WIN64 // windows 64&&32 systems
+#ifdef _WIN64 // windows 64x32 systems
 
 #endif
 // standard libs
 #include <vector>
 #include <optional>
+#include <thread>
+#include <functional>
+#include <memory>
+#include <iostream>
+#include <cstring>
 
 struct Peer { // connected peer
 private:
@@ -20,23 +28,22 @@ private:
   int sockfd; // socket
   struct sockaddr_in sockaddr; // socket info
   // flags
-  unsigned int timeout; // time between last communication to close connection
-  bool host; // eg. did I initiate this communication?
-  bool local; // local connect?
-  bool close; // close connection?
-  // buffer for read & handler for dealing with the buffer
-  char* (*handler)(Peer*);
-  char buffer[256];
+  bool local = false; // local connect? && used in logic loop
 public:
-  Peer(int sock, struct sockaddr_in socka) : sockfd(sock), sockaddr(socka);
-  void Set_Handler(char* (*handler)(Peer*)); // message handler, returns char* to be sent
-  void Start();
-  ~Peer();
+  // Utility
+  int Socket(); // get
+  bool Local(); // get
+  // Runtime
+  Peer(int sock, struct sockaddr_in socka, bool local);
+  void Start(void (*h)(Peer*));
+  std::string Read(unsigned int t);
+  void Write(std::string m, unsigned int t);
+  void Close();
 };
 
 struct Session { // socket session
 private:
-  // socket/ip info
+  // socket info
   int sockfd;
   struct sockaddr_in sockaddr;
   // config
@@ -45,20 +52,33 @@ private:
   // flags
   bool close = false;
   // status/connection management
-  bool(*criteria)(const char*); // accept criteria function, takes IP
-  std::vector<Peer> connections;
+  bool(*_criteria)(std::string); // accept criteria function, takes IP
 public:
-  Session(
+  // Utility
+  void Criteria(bool(*criteria)(std::string));
+  Session (
     unsigned short port,
-    unsigned short queue_limit
-  ) : port(port), queue_limit(queue_limit);
-  Peer* Acceptor(bool(*criteria)(const char*));
+    unsigned short queue_limit,
+    int sockfd,
+    struct sockaddr_in _self
+  );
+  // Runtime
+  Peer Accept(); /** incoming connections */
+  Peer Connect(std::string ip); /** outbound connections */
   void Close();
-  // TODO: user/application functions
-  ~Session();
 };
 
-void error(char *emsg); // catches sys/api errors (can overwrite)
+Session Create(unsigned short port, unsigned short queue_limit);
 
-Session Create_socket(std::optional<const char*> target_ip, unsigned short port, unsigned short queue_limit=5);
-// sys api dependent functions
+struct Timeout {
+private:
+  bool flag; // flag to flip on timeout
+  std::thread await; // awaiting thread (to join)
+  std::atomic<bool> _cancel; // cancel flag
+  void _async(int ft); // inner async loop
+public:
+  Timeout(unsigned int t, bool* flag);
+  void Cancel();
+};
+
+void errc(std::string); // configurable error handler
