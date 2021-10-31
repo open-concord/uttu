@@ -12,14 +12,9 @@ void handler(Peer* p) {
   p->Close();
 }
 
-void handler2(Peer* p) {
-  p->Write("i started this converstation, and I'm going to finish it"/** message */, 3000/** timeout */);
-  p->Close();
-}
-
 int main () {
   int i = 3;
-  Session st = Create(1337, 5);
+  Session st = Create(1337, 5, "test/key.pem", "test/cert.pem");
   st.Criteria(&watchdog);
 
   /** await connections */
@@ -28,9 +23,5 @@ int main () {
     new_peer.Start(&handler);
   };
 
-  /** connect to another node */
-  //Peer outside_peer = st.Connect("127.0.0.1");
-  //outside_peer.Start(&handler2);
-  printf("%s\n", "about to exit");
   return 0;
 };

@@ -21,10 +21,13 @@
 #include <memory>
 #include <iostream>
 #include <cstring>
+// sharding across different sections to reduce bloat
+#include "sec.hpp"
 
 struct Peer { // connected peer
 private:
   // socket/ip info
+  dhms sec; // dhms
   int sockfd; // socket
   struct sockaddr_in sockaddr; // socket info
   // flags
@@ -55,12 +58,15 @@ private:
   bool(*_criteria)(std::string); // accept criteria function, takes IP
 public:
   // Utility
+  int Socket();
   void Criteria(bool(*criteria)(std::string));
   Session (
     unsigned short port,
     unsigned short queue_limit,
     int sockfd,
-    struct sockaddr_in _self
+    struct sockaddr_in _self,
+    std::string pk,
+    std::string cr
   );
   // Runtime
   Peer Accept(); /** incoming connections */
@@ -68,17 +74,23 @@ public:
   void Close();
 };
 
-Session Create(unsigned short port, unsigned short queue_limit);
-
 struct Timeout {
 private:
-  bool flag; // flag to flip on timeout
+  int sk; // socket to kill on timeout
   std::thread await; // awaiting thread (to join)
   std::atomic<bool> _cancel; // cancel flag
   void _async(int ft); // inner async loop
 public:
-  Timeout(unsigned int t, bool* flag);
+  Timeout(unsigned int t, int s);
   void Cancel();
 };
 
+Session Create(
+  unsigned short port,
+  unsigned short queue_limit,
+  std::string pk,
+  std::string cr
+);
+
 void errc(std::string); // configurable error handler
+void Kill_Socket(int s); // called on timeout; configurable

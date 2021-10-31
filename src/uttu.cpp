@@ -2,7 +2,9 @@
 
 Session Create(
   unsigned short port,
-  unsigned short queue_limit=5
+  unsigned short queue_limit,
+  std::string pk,
+  std::string cr
 ) {
   // TODO: actually check system max
   if(queue_limit > 5) {errc("QUEUE_LIMIT MUST BE LESS THAN OR EQUAL TO 5");}
@@ -26,6 +28,15 @@ Session Create(
   ) <0) {errc("COULD NOT BIND");} // [ERROR]
 
   listen(sockfd, queue_limit);
-  Session s(port, queue_limit, sockfd, _self);
+  Session s(port, queue_limit, sockfd, _self, pk, cr);
   return s;
+}
+
+void Kill_Socket(int s) {
+  // do stuff here
+  printf("%s\n", "Killing Socket");
+  // don't do stuff here
+  if (shutdown(s, 2) < 0) {
+    errc("COULD NOT CLOSE TIMED OUT SOCKET");
+  }
 }

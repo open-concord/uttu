@@ -6,12 +6,12 @@ void Timeout::_async(int ft) {
   while(std::time(nullptr) < ft) {
     if (this->_cancel) {return;}
   }
-  this->flag = !flag; // flip bool
+  Kill_Socket(this->sk); // kill socket
 }
 
 // public
-Timeout::Timeout(unsigned int t, bool* flag) {
-  this->flag = flag;
+Timeout::Timeout(unsigned int t, int s) {
+  this->sk = s;
   this->await = std::thread(&Timeout::_async, this, (std::time(nullptr)+t));
 }
 

@@ -12,18 +12,19 @@ Peer::Peer(
   int sock,
   struct sockaddr_in socka,
   bool local
-) : sockfd(sock), sockaddr(socka), local(local) {};
+) : sockfd(sock), sockaddr(socka), local(local), sec(dhms()) {};
 
 void Peer::Start(void (*h)(Peer*)) {
+  // get peer pub [FC]
+  
   h(this);
 }
 
 std::string Peer::Read(unsigned int t) {
-  bool d = false;
   char* b = new char[1024]; // maybe set this to be configurable?
-  Timeout to(t, &d);
+  Timeout to(t, this->Socket());
   bzero(b, sizeof(b)); // zero out buffer
-  if (read(this->Socket() /** for standardization */, b, (sizeof(b)-1)) < 0 || d == true) {
+  if (read(this->Socket() /** for standardization */, b, (sizeof(b)-1)) < 0) {
     errc("COULD NOT READ");
     to.Cancel();
     return nullptr;
@@ -33,9 +34,8 @@ std::string Peer::Read(unsigned int t) {
 }
 
 void Peer::Write(std::string m, unsigned int t) {
-  bool d = false;
-  Timeout to(t, &d);
-  if (send(this->Socket()/** for standardization */, m.c_str(), m.size(), 0) < 0 || d == true) {
+  Timeout to(t, this->Socket());
+  if (send(this->Socket()/** for standardization */, m.c_str(), m.size(), 0) < 0) {
     errc("COULD NOT WRITE");
     to.Cancel();
     return;
