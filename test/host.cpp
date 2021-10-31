@@ -14,7 +14,7 @@ void handler(Peer* p) {
 
 int main () {
   int i = 3;
-  Session st = Create(1337, 5, "test/key.pem", "test/cert.pem");
+  Session st = Create(1337, 5);
   st.Criteria(&watchdog);
 
   /** await connections */

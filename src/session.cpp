@@ -12,9 +12,7 @@ Session::Session(
   unsigned short port,
   unsigned short queue_limit,
   int sockfd,
-  struct sockaddr_in _self,
-  std::string pk,
-  std::string cr
+  struct sockaddr_in _self
 ) : port(port),
     queue_limit(queue_limit),
     sockfd(sockfd),
@@ -55,7 +53,7 @@ Peer Session::Accept() {
     // local checking
     std::string ips(ip);
     if (ips == "127.0.0.1" || ips == "::1") {f = true;}
-    Peer p(_peerfd, _peer, f);    
+    Peer p(_peerfd, _peer, f);
     return p;
   }
 

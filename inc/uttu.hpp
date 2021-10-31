@@ -64,9 +64,7 @@ public:
     unsigned short port,
     unsigned short queue_limit,
     int sockfd,
-    struct sockaddr_in _self,
-    std::string pk,
-    std::string cr
+    struct sockaddr_in _self
   );
   // Runtime
   Peer Accept(); /** incoming connections */
