@@ -8,28 +8,35 @@ dhms::dhms() : ecd(ECDH<ECP>::Domain(ASN1::secp256r1()/** NIST compliant 256 bit
     ppub(this->ecd.PublicKeyLength()),
     shared(this->ecd.AgreedValueLength())
 {
+  this->Keys(); // gen new keys
+}
+
+SecByteBlock dhms::_Set(std::string k) {
+  std::string rk;
+  StringSource (k, true,
+    new HexDecoder (
+      new StringSink(rk)
+    )
+  );
+  SecByteBlock sb(reinterpret_cast<const byte*>(&rk[0]), rk.size());
+  return sb;
+}
+
+std::string dhms::_Get(SecByteBlock* k) {
+  std::string rk, ek;
+  SecByteBlock bk = *k;
+  rk = std::string(reinterpret_cast<const char*>(&bk[0]), bk.size());
+  StringSource (rk, true,
+    new HexEncoder (
+      new StringSink(ek)
+    )
+  );
+  return ek;
+}
+
+void dhms::Keys() {
   AutoSeededRandomPool rp;
-  this->Keys(&rp); // gen new keys
-}
-
-std::string dhms::Get(SecByteBlock* k) {
-  Integer s;
-  s.Decode(k->BytePtr(), k->SizeInBytes());
-
-  std::stringstream ss;
-  ss << std::hex << s;
-  return ss.str();
-}
-
-void dhms::Set(std::string k, SecByteBlock* t) {
-  Integer ik(k.c_str()); // str to cryptopp::Int
-  size_t es = ik.MinEncodedSize(Integer::UNSIGNED);
-  t->resize(es);
-  ik.Encode(t->BytePtr(), es, Integer::UNSIGNED); // push to sec byte block
-}
-
-void dhms::Keys(AutoSeededRandomPool* rp) {
-  ecd.GenerateKeyPair(*rp, this->pri, this->pub);
+  ecd.GenerateKeyPair(rp, this->pri, this->pub);
 }
 
 void dhms::Gen() {
@@ -40,13 +47,75 @@ void dhms::Gen() {
 }
 
 void dhms::Peer(std::string p) {
-  this->Set(p, &ppub);
+  this->ppub = this->_Set(p);
 }
 
 std::string dhms::Public() {
-  return this->Get(&this->pub);
+  return this->_Get(&this->pub);
 }
 
 std::string dhms::Shared() {
-  return this->Get(&this->shared);
+  return this->_Get(&this->shared);
+}
+
+std::string dhms::AE(std::string in) {
+  GCM<AES>::Encryption e;
+  AutoSeededRandomPool rng;
+
+  /** generate iv*/
+  SecByteBlock iv(e.IVSize());
+  rng.GenerateBlock(iv, iv.size());
+
+  /** setting shared & iv to e */
+  std::string siv = this->_Get(&iv);
+  e.SetKeyWithIV(this->shared, this->shared.size(), iv, iv.size());
+
+  /** pump */
+  std::string out; // enc out
+  StringSource(in, true,
+    new AuthenticatedEncryptionFilter(
+      e,
+      new HexEncoder(
+        new StringSink(out)
+      ),
+      false,
+      this->tag
+    )
+  );
+  /** appened iv to out */
+  return out+"$"+siv;
+}
+
+std::string dhms::AD(std::string in) {
+  /** seperate msg */
+  std::cout << "FULL: " << in << "\n";
+  std::string sin = in.substr(0, in.find("$")); // 0->delimter
+  std::string siv = in.substr((in.find("$")+1)); // delimter->end
+
+  /** GCM engine */
+  GCM<AES>::Decryption d;
+
+  /** pull iv */
+  SecByteBlock iv = this->_Set(siv);
+  d.SetKeyWithIV(this->shared, this->shared.size(), iv, iv.size());
+
+  /** AES */
+  std::string out;
+
+  AuthenticatedDecryptionFilter df (
+    d,
+    new StringSink(out),
+    AuthenticatedDecryptionFilter::DEFAULT_FLAGS,
+    this->tag
+  );
+
+  StringSource(sin, true,
+    new HexDecoder(
+      new Redirector(df)
+    )
+  );
+
+  if(df.GetLastResult() == true) {
+    return out;
+  }
 }

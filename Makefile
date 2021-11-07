@@ -1,5 +1,3 @@
-default: linux
-
 CC = g++ -g -std=c++20
 LINK = -lpthread -lrt -Wall -lcryptopp #-lconcord
 
@@ -19,6 +17,20 @@ linux:
 	src/api/linux.cpp \
 	test/host.cpp \
 	-o uttu.out \
+	$(LINK)
+
+c: # client
+	$(src) \
+	src/api/linux.cpp \
+	test/client.cpp \
+	-o c.out \
+	$(LINK)
+
+h: # client
+	$(src) \
+	src/api/linux.cpp \
+	test/host.cpp \
+	-o h.out \
 	$(LINK)
 
 dh:

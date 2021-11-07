@@ -9,6 +9,7 @@
   #include <strings.h> // bzero
   #include <unistd.h> // close, accept, etc
   #include <arpa/inet.h> // needed for ip ID
+  #include <netdb.h> // gethostbyname
 #endif
 #ifdef _WIN64 // windows 64x32 systems
 
@@ -21,8 +22,11 @@
 #include <memory>
 #include <iostream>
 #include <cstring>
+#include <nlohmann/json.hpp>
 // sharding across different sections to reduce bloat
 #include "sec.hpp"
+
+using json = nlohmann::json;
 
 struct Peer { // connected peer
 private:
@@ -32,13 +36,17 @@ private:
   struct sockaddr_in sockaddr; // socket info
   // flags
   bool local = false; // local connect? && used in logic loop
+  // raw functions
+  std::string Raw_Read(unsigned int t);
+  void Raw_Write(std::string m, unsigned int t);
 public:
   // Utility
   int Socket(); // get
   bool Local(); // get
   // Runtime
   Peer(int sock, struct sockaddr_in socka, bool local);
-  void Start(void (*h)(Peer*));
+  void Start(void (*h)(Peer*)); // r only, no need for shared_ptr
+
   std::string Read(unsigned int t);
   void Write(std::string m, unsigned int t);
   void Close();
@@ -67,8 +75,8 @@ public:
     struct sockaddr_in _self
   );
   // Runtime
-  Peer Accept(); /** incoming connections */
-  Peer Connect(std::string ip); /** outbound connections */
+  std::shared_ptr<Peer> Accept(); /** incoming connections */
+  std::shared_ptr<Peer> Connect(std::string ip, unsigned int port); /** outbound connections */
   void Close();
 };
 
@@ -85,9 +93,7 @@ public:
 
 Session Create(
   unsigned short port,
-  unsigned short queue_limit,
-  std::string pk,
-  std::string cr
+  unsigned short queue_limit
 );
 
 void errc(std::string); // configurable error handler

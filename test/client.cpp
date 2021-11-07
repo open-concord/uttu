@@ -13,14 +13,14 @@ void handler(Peer* p) {
 }
 
 int main () {
-  int i = 3;
-  Session st = Create(1337, 5);
+  Session st = Create(1338, 5);
   st.Criteria(&watchdog);
 
-  /** await connections */
+  std::cout << "made session\n";
 
-  std::shared_ptr<Peer> new_peer = st.Accept();
-  new_peer->Start(&handler);
+  std::shared_ptr<Peer> p = st.Connect("127.0.0.1", 1337);
+  std::cout << "connect done\n";
+  p->Start(&handler);
 
   return 0;
 };

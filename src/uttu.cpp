@@ -2,9 +2,7 @@
 
 Session Create(
   unsigned short port,
-  unsigned short queue_limit,
-  std::string pk,
-  std::string cr
+  unsigned short queue_limit
 ) {
   // TODO: actually check system max
   if(queue_limit > 5) {errc("QUEUE_LIMIT MUST BE LESS THAN OR EQUAL TO 5");}
@@ -28,7 +26,7 @@ Session Create(
   ) <0) {errc("COULD NOT BIND");} // [ERROR]
 
   listen(sockfd, queue_limit);
-  Session s(port, queue_limit, sockfd, _self, pk, cr);
+  Session s(port, queue_limit, sockfd, _self);
   return s;
 }
 
