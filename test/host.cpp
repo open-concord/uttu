@@ -13,14 +13,15 @@ void handler(Peer* p) {
 }
 
 int main () {
-  int i = 3;
+  int j = 3;
   Session st = Create(1337, 5);
   st.Criteria(&watchdog);
 
   /** await connections */
-
-  std::shared_ptr<Peer> new_peer = st.Accept();
-  new_peer->Start(&handler);
+  for (int i=0; i<j; i++) {
+    std::shared_ptr<Peer> new_peer = st.Accept();
+    new_peer->Start(&handler);
+  }
 
   return 0;
 };
