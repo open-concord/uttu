@@ -36,6 +36,7 @@ private:
   struct sockaddr_in sockaddr; // socket info
   // flags
   bool local = false; // local connect? && used in logic loop
+  bool host = true;
   // raw functions
   std::string Raw_Read(unsigned int t);
   void Raw_Write(std::string m, unsigned int t);
@@ -43,8 +44,9 @@ public:
   // Utility
   int Socket(); // get
   bool Local(); // get
+  bool Host(); // get
   // Runtime
-  Peer(int sock, struct sockaddr_in socka, bool local);
+  Peer(int sock, struct sockaddr_in socka, bool local, bool host);
   void Start(void (*h)(Peer*)); // r only, no need for shared_ptr
 
   std::string Read(unsigned int t);
@@ -76,7 +78,7 @@ public:
   );
   // Runtime
   std::shared_ptr<Peer> Accept(); /** incoming connections */
-  std::shared_ptr<Peer> Connect(std::string ip, unsigned int port); /** outbound connections */
+  std::shared_ptr<Peer> Connect(std::string ip); /** outbound connections */
   void Close();
 };
 

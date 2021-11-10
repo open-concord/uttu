@@ -13,11 +13,10 @@ dhms::dhms() : ecd(ECDH<ECP>::Domain(ASN1::secp256r1()/** NIST compliant 256 bit
 
 SecByteBlock dhms::_Set(std::string k) {
   std::string rk;
-  StringSource (k, true,
-    new HexDecoder (
-      new StringSink(rk)
-    )
-  );
+  /** written so it's blocking */
+  HexDecoder ex(new StringSink(rk));
+  ex.Put((const byte*)k.data(), k.size(), true /** blocking */);
+  ex.MessageEnd();
   SecByteBlock sb(reinterpret_cast<const byte*>(&rk[0]), rk.size());
   return sb;
 }
@@ -26,11 +25,10 @@ std::string dhms::_Get(SecByteBlock* k) {
   std::string rk, ek;
   SecByteBlock bk = *k;
   rk = std::string(reinterpret_cast<const char*>(&bk[0]), bk.size());
-  StringSource (rk, true,
-    new HexEncoder (
-      new StringSink(ek)
-    )
-  );
+  /** written so it's blocking */
+  HexEncoder dx(new StringSink(ek));
+  dx.Put((const byte*)rk.data(), rk.size(), true /** blocking */);
+  dx.MessageEnd();
   return ek;
 }
 
@@ -88,7 +86,6 @@ std::string dhms::AE(std::string in) {
 
 std::string dhms::AD(std::string in) {
   /** seperate msg */
-  std::cout << "FULL: " << in << "\n";
   std::string sin = in.substr(0, in.find("$")); // 0->delimter
   std::string siv = in.substr((in.find("$")+1)); // delimter->end
 

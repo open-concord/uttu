@@ -6,9 +6,9 @@ bool watchdog(std::string ip) {
 }
 
 void handler(Peer* p) {
+  p->Write("i use arch btw\n" /** message */, 3000 /** timeout */);
   std::cout << "new msg: " << p->Read(3000) << "\n";
   std::cout << "Is local? " << p->Local() << "\n";
-  p->Write("i use arch btw\n" /** message */, 3000 /** timeout */);
   p->Close();
 }
 
@@ -18,7 +18,7 @@ int main () {
 
   std::cout << "made session\n";
 
-  std::shared_ptr<Peer> p = st.Connect("127.0.0.1", 1337);
+  std::shared_ptr<Peer> p = st.Connect("127.0.0.1:1337");
   std::cout << "connect done\n";
   p->Start(&handler);
 

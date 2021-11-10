@@ -8,48 +8,69 @@ bool Peer::Local() {
   return this->local;
 }
 
+bool Peer::Host() {
+  return this->host;
+}
+
 Peer::Peer(
   int sock,
   struct sockaddr_in socka,
-  bool local
-) : sec(dhms()), sockfd(sock), sockaddr(socka), local(local) {};
+  bool local,
+  bool host
+) : sec(dhms()), sockfd(sock), sockaddr(socka), local(local), host(host) {};
 
 void Peer::Start(void (*h)(Peer*)) {
-  // get peer pub [FC]
-  json fco = {
-    {"FC", "KE"},
-    {"CONT", this->sec.Public()}
-  };
-  std::cout << fco.dump() << "\n";
-  this->Raw_Write(fco.dump(), 3000);
+  // do key exchange [FC]
+  try {
+    json fco;
+    fco["FLAG"] = "KE";
+    fco["CONT"] = this->sec.Public();
 
-  auto fci = json::parse(this->Raw_Read(3000));
-  std::cout << fci << "\n";
-  if (fci["FLAG"] != "KE") {errc("COULD NOT COMPLETE FC");}
-  this->sec.Peer(fci["CONT"]);
+    this->Raw_Write(fco.dump(), 3000);
 
+    std::string rs = this->Raw_Read(3000);
+    auto fci = json::parse(rs);
+
+    if (fci["FLAG"] != "KE") {errc("COULD NOT COMPLETE FC");}
+    this->sec.Peer(fci["CONT"].get<std::string>());
+    this->sec.Gen();
+  } catch (...) {
+    errc("Peer::Start, Could not complete Key Exchange");
+  }
   h(this);
 }
 
 std::string Peer::Raw_Read(unsigned int t) {
-  char* b = new char[1024]; // maybe set this to be configurable?
+  /** read size header */
+  char sh[4];
   Timeout to(t, this->Socket());
-  bzero(b, sizeof(b)); // zero out buffer
-  if (read(this->Socket() /** for standardization */, b, (sizeof(b)-1)) < 0) {
+  bzero(sh, 4); // zero out buffer
+  if (read(this->Socket(), &sh, 4) < 0) {
     errc("COULD NOT READ");
-    to.Cancel();
-    return nullptr;
+  }
+
+  int s = atoi(sh)+4;
+  char b[s];
+  /** read message */
+  bzero(b, s); // zero out buffer
+  if (read(this->Socket(), &b, s) < 0) {
+    errc("COULD NOT READ");
   }
   to.Cancel();
   return std::string(b);
 }
 
 void Peer::Raw_Write(std::string m, unsigned int t) {
+  /** 4 dec place size header */
+  std::string so = std::to_string(m.size());
+  while (so.size()<4) {
+    so.insert(0, "0");
+  }
+  std::string o = so+m;
+
   Timeout to(t, this->Socket());
-  if (send(this->Socket()/** for standardization */, m.c_str(), m.size(), 0) < 0) {
+  if (write(this->Socket(), o.data(), o.size()) < 0) {
     errc("COULD NOT WRITE");
-    to.Cancel();
-    return;
   };
   to.Cancel();
 }

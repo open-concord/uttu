@@ -25,7 +25,7 @@ std::shared_ptr<Peer> Session::Accept() {
   struct sockaddr_in _peer;
   socklen_t _peerlen;
 
-  // start timeout
+  // start possibly hanging accept
   Timeout to(3000, this->Socket());
   int _peerfd = accept(
     this->sockfd,
@@ -52,7 +52,7 @@ std::shared_ptr<Peer> Session::Accept() {
     // local checking
     std::string ips(ip);
     if (ips == "127.0.0.1" || ips == "::1") {f = true;}
-    auto p = std::make_shared<Peer> (_peerfd, _peer, f);
+    auto p = std::make_shared<Peer> (_peerfd, _peer, f, true);
     return p;
   }
 
@@ -61,30 +61,48 @@ std::shared_ptr<Peer> Session::Accept() {
   }
 }
 
-std::shared_ptr<Peer> Session::Connect(std::string ip, unsigned int port) {
+std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
   if(this->close) {this->Close();}
 
-  struct sockaddr_in _peer;
+  struct sockaddr_in _peer; // peer addr
+  struct hostent* s;
+
+  int port = atoi(target.substr((target.find(":")+1)).data()); // delimter->end
+  int _peerfd = socket(AF_INET, SOCK_STREAM, 0);
+  if (_peerfd < 0) {
+    errc("[CONNECT], COULD NOT CREATE SOCKET");
+  }
+
+  Timeout th(3000, this->Socket());
+  s = gethostbyname(target.substr(0, target.find(":")).data());
+  if (s == NULL) {
+    errc("[CONNECT], COULD NOT FIND PEER");
+  }
+  th.Cancel();
+  bzero((char*) &_peer, sizeof(_peer));
 
   _peer.sin_family = AF_INET;
   _peer.sin_port = htons(port);
-
-  if (inet_pton(AF_INET, ip.c_str(), &_peer.sin_addr) < 0) {
-    errc("COULD NOT PTON TARGET IP");
-  }
+  bcopy(
+    (char*)s->h_addr,
+    (char*)&_peer.sin_addr.s_addr,
+    s->h_length
+  );
 
   // start timeout
   Timeout to(3000, this->Socket());
-  int _peerfd = connect(
-    this->sockfd,
+  if (connect(
+    _peerfd,
     (struct sockaddr*) &_peer,
-    sizeof(_peer)
-  );
+    (socklen_t) sizeof(_peer)
+  ) < 0) {
+    errc("[CONNECT], COULD NOT CONNECT");
+  };
   to.Cancel();
 
   bool f;
-  (ip == "127.0.0.1") ? f = true : f = false;
-  auto p = std::make_shared<Peer>(_peerfd, _peer, f);
+  (target.substr(0, target.find(":")) == "127.0.0.1") ? f = true : f = false;
+  auto p = std::make_shared<Peer>(_peerfd, _peer, f, false);
   return p;
 }
 

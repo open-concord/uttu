@@ -14,13 +14,13 @@ void handler(Peer* p) {
 
 int main () {
   int j = 3;
-  Session st = Create(1337, 5);
-  st.Criteria(&watchdog);
+  Session h = Create(1337, 5);
+  h.Criteria(&watchdog);
 
   /** await connections */
   for (int i=0; i<j; i++) {
-    std::shared_ptr<Peer> new_peer = st.Accept();
-    new_peer->Start(&handler);
+    std::shared_ptr<Peer> hp = h.Accept();
+    hp->Start(&handler);
   }
 
   return 0;
