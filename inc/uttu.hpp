@@ -85,7 +85,7 @@ public:
 struct Timeout {
 private:
   int sk; // socket to kill on timeout
-  std::thread await; // awaiting thread (to join)
+  std::thread expire;
   std::atomic<bool> _cancel; // cancel flag
   void _async(int ft); // inner async loop
 public:
