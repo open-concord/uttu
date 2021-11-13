@@ -56,12 +56,12 @@ public:
 
 struct Session { // socket session
 private:
-  // socket info
-  int sockfd;
-  struct sockaddr_in sockaddr;
   // config
   unsigned short port;
   unsigned short queue_limit;
+  // socket info
+  int sockfd;
+  struct sockaddr_in sockaddr;
   // flags
   bool close = false;
   // status/connection management
