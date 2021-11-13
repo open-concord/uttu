@@ -7,7 +7,7 @@ void Timeout::_async(int t) {
   try {
     if (this->_cancel) {
       throw;
-    } {
+    } else {
       Kill_Socket(this->sk);
     }
   } catch (...) {
