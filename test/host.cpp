@@ -5,23 +5,36 @@ bool watchdog(std::string ip) {
   return true; // Anybody can be a peer!
 }
 
-void handler(Peer* p) {
+void hh(Peer* p) {
   std::cout << "new msg: " << p->Read(3000) << "\n";
   std::cout << "Is local? " << p->Local() << "\n";
   p->Write("i use arch btw\n" /** message */, 3000 /** timeout */);
   p->Close();
 }
 
+void ch(Peer* p) {
+  p->Write("i use arch btw\n" /** message */, 3000 /** timeout */);
+  std::cout << "new msg: " << p->Read(3000) << "\n";
+  std::cout << "Is local? " << p->Local() << "\n";
+  p->Close();
+}
+
+void event(std::shared_ptr<Peer> p) {
+  p->Start(&hh);
+}
+
 int main () {
-  int j = 3;
   Session h = Create(1337, 5);
   h.Criteria(&watchdog);
 
+  Session c = Create(1338, 5);
+  c.Criteria(&watchdog);
+
   /** await connections */
-  for (int i=0; i<j; i++) {
-    std::shared_ptr<Peer> hp = h.Accept();
-    hp->Start(&handler);
-  }
+  h.Lazy(&event);
+  std::shared_ptr<Peer> p = c.Connect("127.0.0.1:1337");
+  p->Start(&ch);
+
 
   return 0;
 };

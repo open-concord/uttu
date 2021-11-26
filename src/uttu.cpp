@@ -25,7 +25,6 @@ Session Create(
     sizeof(_self)
   ) <0) {errc("COULD NOT BIND");} // [ERROR]
 
-  listen(sockfd, queue_limit);
   Session s(port, queue_limit, sockfd, _self);
   return s;
 }

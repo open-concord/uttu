@@ -10,10 +10,12 @@
   #include <unistd.h> // close, accept, etc
   #include <arpa/inet.h> // needed for ip ID
   #include <netdb.h> // gethostbyname
+  #include <poll.h> // ppoll & poll
 #endif
 #ifdef _WIN64 // windows 64x32 systems
-
+  #include <ws2def.h>
 #endif
+
 // standard libs
 #include <vector>
 #include <optional>
@@ -66,6 +68,10 @@ private:
   bool close = false;
   // status/connection management
   bool(*_criteria)(std::string); // accept criteria function, takes IP
+  /** lazy handling */
+  // inner thread loop for Lazy()
+  void _Lazy(void (*h)(std::shared_ptr<Peer>));
+  std::thread _lt;
 public:
   // Utility
   int Socket();
@@ -77,8 +83,10 @@ public:
     struct sockaddr_in _self
   );
   // Runtime
+  void Open();
   std::shared_ptr<Peer> Accept(); /** incoming connections */
   std::shared_ptr<Peer> Connect(std::string ip); /** outbound connections */
+  void Lazy(void(*h)(std::shared_ptr<Peer>));
   void Close();
 };
 

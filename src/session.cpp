@@ -19,6 +19,10 @@ Session::Session(
     sockaddr(_self)
 {};
 
+void Session::Open() {
+  listen(this->sockfd, this->queue_limit);
+}
+
 std::shared_ptr<Peer> Session::Accept() {
   if(this->close) {this->Close();}
 
@@ -104,6 +108,35 @@ std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
   (target.substr(0, target.find(":")) == "127.0.0.1") ? f = true : f = false;
   auto p = std::make_shared<Peer>(_peerfd, _peer, f, false);
   return p;
+}
+
+void Session::_Lazy(void(*h)(std::shared_ptr<Peer>)) {
+  /** put this in a thread */
+  try {
+    while(!this->close) {
+      struct pollfd pf;
+      pf.fd = this->Socket();
+      pf.events = POLLIN; /** man pages poll(2) has the bit mask values */
+
+      switch (poll(&pf, 1, 3000)) {
+        case -1:
+          errc("POLL RETURNED -1");
+        case 0:
+          h(this->Accept());
+          continue;
+      }
+    }
+    throw;
+  } catch (...) {
+    return;
+  }
+
+}
+
+void Session::Lazy(void(*h)(std::shared_ptr<Peer>)) {
+  /** put this in a thread */
+  std::thread lt(&Session::_Lazy, this, h);
+  lt.detach();
 }
 
 void Session::Close() {
