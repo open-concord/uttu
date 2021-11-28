@@ -1,48 +1,52 @@
-CC = g++ -g -std=c++20
-LINK = -lpthread -lrt -Wall -lcryptopp #-lconcord
+CC = g++ -c -std=c++20
+LINK = -lpthread -lrt -Wall -lcryptopp
 
-src = $(CC) \
-	inc/uttu.hpp \
-	src/timeout.cpp \
-	src/peer.cpp \
-	src/session.cpp \
-	src/uttu.cpp \
-	src/err.cpp \
-	src/sec.cpp \
-	src/api/linux.cpp # remove in production
-	# linux || windows || posix depending on host
+# convenience variable
+OBJ = err.o \
+			uttu.o \
+			timeout.o \
+			peer.o \
+			session.o \
+			sec.o
 
-linux:
-	$(src) \
-	src/api/linux.cpp \
-	test/host.cpp \
-	-o uttu.out \
-	$(LINK)
+# target file and install directory
+OFILE = libuttu.a
+IDIR  = ./exe
 
-c: # client
-	$(src) \
-	src/api/linux.cpp \
-	test/client.cpp \
-	-o c.out \
-	$(LINK)
+# build rules
+linux: $(OBJ)
+	rm *.gch
+	ar ru libuttu.a $^ linux.o
+	ranlib libuttu.a
+	mv *.a exe/
+	mv *.o bin/
 
-h: # client
-	$(src) \
-	src/api/linux.cpp \
-	test/host.cpp \
-	-o h.out \
-	$(LINK)
+posix: $(OBJ)
+	ar ru libuttu.a $^ posix.o
+	ranlib libuttu.a
 
-dh:
-	$(src) \
-	test/dh.cpp \
-	-o dh.out \
-	$(LINK)
+windows: $(OBJ)
+	ar ru libuttu.a $^ windows.o
+	ranlib libuttu.a
 
-windows:
-	$(src) \
-	src/windows.cpp
+# 'base' implementation files
+timeout.o:
+	$(CC) inc/uttu.hpp src/timeout.cpp
+peer.o:
+	$(CC) inc/uttu.hpp src/peer.cpp
+session.o:
+	$(CC) inc/uttu.hpp src/session.cpp
+uttu.o:
+	$(CC) inc/uttu.hpp src/uttu.cpp
+err.o:
+	$(CC) inc/uttu.hpp src/err.cpp
+sec.o:
+	$(CC) inc/uttu.hpp src/sec.cpp
 
-posix:
-	$(src) \
-	src/posix.cpp
+# sys dependendent
+linux.o: inc/uttu.hpp
+	$(CC) src/api/linux.cpp
+posix.o: inc/uttu.hpp
+	$(CC) src/api/linux.cpp
+windows.o: inc/uttu.hpp
+	$(CC) src/api/windows.cpp

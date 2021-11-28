@@ -68,7 +68,6 @@ private:
   bool close = false;
   // status/connection management
   bool(*_criteria)(std::string); // accept criteria function, takes IP
-  /** lazy handling */
   // inner thread loop for Lazy()
   void _Lazy(void (*h)(std::shared_ptr<Peer>));
   std::thread _lt;
@@ -86,7 +85,7 @@ public:
   void Open();
   std::shared_ptr<Peer> Accept(); /** incoming connections */
   std::shared_ptr<Peer> Connect(std::string ip); /** outbound connections */
-  void Lazy(void(*h)(std::shared_ptr<Peer>));
+  void Lazy(void(*h)(std::shared_ptr<Peer>)); /** lazy accept */
   void Close();
 };
 
