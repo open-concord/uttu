@@ -19,7 +19,7 @@ Peer::Peer(
   bool host
 ) : sec(dhms()), sockfd(sock), sockaddr(socka), local(local), host(host) {};
 
-void Peer::Start(void (*h)(Peer*)) {
+void Peer::Start(std::function<void(Peer*)> h) {
   // do key exchange [FC]
   try {
     json fco;

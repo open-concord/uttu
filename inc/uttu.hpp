@@ -49,7 +49,7 @@ public:
   bool Host(); // get
   // Runtime
   Peer(int sock, struct sockaddr_in socka, bool local, bool host);
-  void Start(void (*h)(Peer*)); // r only, no need for shared_ptr
+  void Start(std::function<void(Peer*)> h); // r only, no need for shared_ptr
 
   std::string Read(unsigned int t);
   void Write(std::string m, unsigned int t);
@@ -67,14 +67,14 @@ private:
   // flags
   bool close = false;
   // status/connection management
-  bool(*_criteria)(std::string); // accept criteria function, takes IP
+  std::function<bool(std::string)> _criteria; // accept criteria function, takes IP
   // inner thread loop for Lazy()
-  void _Lazy(void (*h)(std::shared_ptr<Peer>));
+  void _Lazy(std::function<void(std::shared_ptr<Peer>)> h);
   std::thread _lt;
 public:
   // Utility
   int Socket();
-  void Criteria(bool(*criteria)(std::string));
+  void Criteria(std::function<bool(std::string)> criteria);
   Session (
     unsigned short port,
     unsigned short queue_limit,
@@ -85,7 +85,7 @@ public:
   void Open();
   std::shared_ptr<Peer> Accept(); /** incoming connections */
   std::shared_ptr<Peer> Connect(std::string ip); /** outbound connections */
-  void Lazy(void(*h)(std::shared_ptr<Peer>)); /** lazy accept */
+  void Lazy(std::function<void(std::shared_ptr<Peer>)> h); /** lazy accept */
   void Close();
 };
 

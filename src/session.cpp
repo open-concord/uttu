@@ -4,7 +4,7 @@ int Session::Socket() {
   return this->sockfd;
 }
 
-void Session::Criteria(bool(*criteria)(std::string)) {
+void Session::Criteria(std::function<bool(std::string)> criteria) {
   this->_criteria = criteria;
 }
 
@@ -110,7 +110,7 @@ std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
   return p;
 }
 
-void Session::_Lazy(void(*h)(std::shared_ptr<Peer>)) {
+void Session::_Lazy(std::function<void(std::shared_ptr<Peer>)> h) {
   /** put this in a thread */
   try {
     while(!this->close) {
@@ -133,7 +133,7 @@ void Session::_Lazy(void(*h)(std::shared_ptr<Peer>)) {
 
 }
 
-void Session::Lazy(void(*h)(std::shared_ptr<Peer>)) {
+void Session::Lazy(std::function<void(std::shared_ptr<Peer>)> h) {
   /** put this in a thread */
   std::thread lt(&Session::_Lazy, this, h);
   lt.detach();
