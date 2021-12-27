@@ -5,24 +5,28 @@ LINK = -lpthread -lrt -Wall -lcryptopp
 CFLAGS = -c -g -Wall -fPIC
 
 # convenience variable
-OBJ = err.o \
-			uttu.o \
-			timeout.o \
-			peer.o \
-			session.o \
-			sec.o
+BIN = bin/
+OBJ = $(BIN)err.o \
+			$(BIN)uttu.o \
+			$(BIN)timeout.o \
+			$(BIN)peer.o \
+			$(BIN)session.o \
+			$(BIN)sec.o
 
 # target file and install directory
-OFILE = libuttu.a
+OFILE = libuttu
 IDIR  = ./exe
 
 # build rules
-linux: linux.o $(OBJ)
-	ar ru libuttu.a $^ linux.o
-	ranlib libuttu.a
+linux_lib: $(BIN)linux.o $(OBJ)
+	ar ru $(OFILE).a $^
+	ranlib $(OFILE).a
 	mv *.a exe/
 	mv *.o bin/
-	rm -f *.gch
+
+linux_obj: $(BIN)linux.o $(OBJ)
+	$ ld -r $(OBJ) -o $(OFILE).o
+	mv *.o exe/
 
 posix: posix.o $(OBJ)
 	ar ru libuttu.a $^ posix.o
@@ -32,24 +36,24 @@ windows: windows.o $(OBJ)
 	ar ru libuttu.a $^ windows.o
 	ranlib libuttu.a
 
-# 'base' implementation files
-timeout.o:
-	$(CC) $(CFLAGS) inc/uttu.hpp src/timeout.cpp
-peer.o:
-	$(CC) $(CFLAGS) inc/uttu.hpp src/peer.cpp
-session.o:
-	$(CC) $(CFLAGS) inc/uttu.hpp src/session.cpp
-uttu.o:
-	$(CC) $(CFLAGS) inc/uttu.hpp src/uttu.cpp
-err.o:
-	$(CC) $(CFLAGS) inc/uttu.hpp src/err.cpp
-sec.o:
-	$(CC) $(CFLAGS) inc/uttu.hpp src/sec.cpp
+# functionality implementation files
+$(BIN)timeout.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/timeout.cpp -o $@
+$(BIN)peer.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/peer.cpp -o $@
+$(BIN)session.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/session.cpp -o $@
+$(BIN)uttu.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/uttu.cpp -o $@
+$(BIN)err.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/err.cpp -o $@
+$(BIN)sec.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/sec.cpp -o $@
 
 # sys dependendent
-linux.o: inc/uttu.hpp
-	$(CC) $(CFLAGS) src/api/linux.cpp
-posix.o: inc/uttu.hpp
-	$(CC) $(CFLAGS) src/api/linux.cpp
-windows.o: inc/uttu.hpp
-	$(CC) $(CFLAGS) src/api/windows.cpp
+$(BIN)linux.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/api/linux.cpp -o $@
+$(BIN)posix.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/api/linux.cpp -o $@
+$(BIN)windows.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/api/windows.cpp -o $@
