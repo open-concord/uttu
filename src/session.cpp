@@ -65,6 +65,7 @@ std::shared_ptr<Peer> Session::Accept() {
   }
 }
 
+// nts; is this really the best way to take input? (check w/ ppl in alpha)
 std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
   if(this->close) {this->Close();}
 
@@ -80,6 +81,7 @@ std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
   Timeout th(3000, this->Socket());
   s = gethostbyname(target.substr(0, target.find(":")).data());
   if (s == NULL) {
+    th.Cancel();
     errc("[CONNECT], COULD NOT FIND PEER");
   }
   th.Cancel();
@@ -100,6 +102,7 @@ std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
     (struct sockaddr*) &_peer,
     (socklen_t) sizeof(_peer)
   ) < 0) {
+    to.Cancel();
     errc("[CONNECT], COULD NOT CONNECT");
   };
   to.Cancel();
@@ -111,20 +114,19 @@ std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
 }
 
 void Session::_Lazy(std::function<void(std::shared_ptr<Peer>)> h) {
-  /** put this in a thread */
   try {
     while(!this->close) {
-      struct pollfd pf;
-      pf.fd = this->Socket();
-      pf.events = POLLIN; /** man pages poll(2) has the bit mask values */
-
-      switch (poll(&pf, 1, 3000)) {
-        case -1:
-          errc("POLL RETURNED -1");
-        case 0:
-          h(this->Accept());
-          continue;
+      struct pollfd pfds[1];
+      pfds[0].fd = this->Socket();
+      pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
+      /** nts: set the timeout to be configurable, infinite by default */
+      poll(pfds, 1, -1);
+      if (pfds[0].revents == POLLIN) {
+        h(this->Accept());
+      } else {
+        break;
       }
+      continue;
     }
     throw;
   } catch (...) {
@@ -133,10 +135,13 @@ void Session::_Lazy(std::function<void(std::shared_ptr<Peer>)> h) {
 
 }
 
-void Session::Lazy(std::function<void(std::shared_ptr<Peer>)> h) {
-  /** put this in a thread */
-  std::thread lt(&Session::_Lazy, this, h);
-  lt.detach();
+void Session::Lazy(std::function<void(std::shared_ptr<Peer>)> h, bool blocking) {
+  if (blocking) {
+    this->_Lazy(h);
+  } else {
+    std::thread lt(&Session::_Lazy, this, h);
+    lt.detach();
+  }
 }
 
 void Session::Close() {

@@ -27,7 +27,6 @@ void Peer::Start(std::function<void(Peer*)> h) {
     fco["CONT"] = this->sec.Public();
 
     this->Raw_Write(fco.dump(), 3000);
-
     std::string rs = this->Raw_Read(3000);
     auto fci = json::parse(rs);
 
@@ -46,6 +45,7 @@ std::string Peer::Raw_Read(unsigned int t) {
   Timeout to(t, this->Socket());
   bzero(sh, 4); // zero out buffer
   if (read(this->Socket(), &sh, 4) < 0) {
+    to.Cancel();
     errc("COULD NOT READ");
   }
 
@@ -54,6 +54,7 @@ std::string Peer::Raw_Read(unsigned int t) {
   /** read message */
   bzero(b, s); // zero out buffer
   if (read(this->Socket(), &b, s) < 0) {
+    to.Cancel();
     errc("COULD NOT READ");
   }
   to.Cancel();
@@ -70,6 +71,7 @@ void Peer::Raw_Write(std::string m, unsigned int t) {
 
   Timeout to(t, this->Socket());
   if (write(this->Socket(), o.data(), o.size()) < 0) {
+    to.Cancel();
     errc("COULD NOT WRITE");
   };
   to.Cancel();

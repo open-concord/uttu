@@ -22,7 +22,6 @@ linux_lib: $(BIN)linux.o $(OBJ)
 	ar ru $(OFILE).a $^
 	ranlib $(OFILE).a
 	mv *.a exe/
-	mv *.o bin/
 
 linux_obj: $(BIN)linux.o $(OBJ)
 	$ ld -r $(OBJ) -o $(OFILE).o
@@ -57,3 +56,8 @@ $(BIN)posix.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/api/linux.cpp -o $@
 $(BIN)windows.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/api/windows.cpp -o $@
+
+clean:
+	rm -f bin/*.o
+	rm -f exe/*.a
+	rm -f exe/*.o

@@ -20,21 +20,24 @@ void ch(Peer* p) {
 }
 
 void event(std::shared_ptr<Peer> p) {
+  std::cout << "event called\n";
   p->Start(&hh);
 }
 
 int main () {
   Session h = Create(1337, 5);
   h.Criteria(&watchdog);
+  h.Open();
+  std::cout << h.Socket() << "\n";
 
   Session c = Create(1338, 5);
   c.Criteria(&watchdog);
 
   /** await connections */
-  h.Lazy(&event);
+  h.Lazy(&event, false);
   std::shared_ptr<Peer> p = c.Connect("127.0.0.1:1337");
+  std::cout << "Connected\n";
+  std::cout << p->Local() << p->Socket() << "\n";
   p->Start(&ch);
-
-
   return 0;
 };

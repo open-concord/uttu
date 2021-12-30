@@ -106,11 +106,10 @@ private:
   std::function<bool(std::string)> _criteria; // accept criteria function, takes IP
   // inner thread loop for Lazy()
   void _Lazy(std::function<void(std::shared_ptr<Peer>)> h);
-  std::thread _lt;
 public:
   // Utility
-  int Socket();
-  void Criteria(std::function<bool(std::string)> criteria);
+  int Socket(); // get
+  void Criteria(std::function<bool(std::string)> criteria); // set
   Session (
     unsigned short port,
     unsigned short queue_limit,
@@ -120,8 +119,8 @@ public:
   // Runtime
   void Open();
   std::shared_ptr<Peer> Accept(); /** incoming connections */
-  std::shared_ptr<Peer> Connect(std::string ip); /** outbound connections */
-  void Lazy(std::function<void(std::shared_ptr<Peer>)> h); /** lazy accept */
+  std::shared_ptr<Peer> Connect(std::string target/**(ip:port) */); /** outbound connections */
+  void Lazy(std::function<void(std::shared_ptr<Peer>)> h, bool blocking); /** lazy accept */
   void Close();
 };
 
