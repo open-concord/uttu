@@ -85,8 +85,7 @@ public:
   bool Host(); // get
   // Runtime
   Peer(int sock, struct sockaddr_in socka, bool local, bool host);
-  void Start(std::function<void(Peer*)> h); // r only, no need for shared_ptr
-
+  void Key_Exchange();
   std::string Read(unsigned int t);
   void Write(std::string m, unsigned int t);
   void Close();
@@ -102,6 +101,7 @@ private:
   struct sockaddr_in sockaddr;
   // flags
   bool close = false;
+  unsigned int tout;
   // status/connection management
   std::function<bool(std::string)> _criteria; // accept criteria function, takes IP
   // inner thread loop for Lazy()
@@ -114,7 +114,8 @@ public:
     unsigned short port,
     unsigned short queue_limit,
     int sockfd,
-    struct sockaddr_in _self
+    struct sockaddr_in _self,
+    unsigned int timeout
   );
   // Runtime
   void Open();
@@ -137,7 +138,8 @@ public:
 
 Session Create(
   unsigned short port,
-  unsigned short queue_limit
+  unsigned short queue_limit,
+  unsigned int timeout
 );
 
 void errc(std::string); // configurable error handler

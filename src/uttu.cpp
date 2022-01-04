@@ -2,7 +2,8 @@
 
 Session Create(
   unsigned short port,
-  unsigned short queue_limit
+  unsigned short queue_limit,
+  unsigned int timeout
 ) {
   // TODO: actually check system max
   if(queue_limit > 5) {errc("QUEUE_LIMIT MUST BE LESS THAN OR EQUAL TO 5");}
@@ -25,7 +26,7 @@ Session Create(
     sizeof(_self)
   ) <0) {errc("COULD NOT BIND");} // [ERROR]
 
-  Session s(port, queue_limit, sockfd, _self);
+  Session s(port, queue_limit, sockfd, _self, timeout);
   return s;
 }
 

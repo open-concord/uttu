@@ -37,7 +37,6 @@ int main () {
   h.Lazy(&event, false);
   std::shared_ptr<Peer> p = c.Connect("127.0.0.1:1337");
   std::cout << "Connected\n";
-  std::cout << p->Local() << p->Socket() << "\n";
   p->Start(&ch);
   return 0;
 };

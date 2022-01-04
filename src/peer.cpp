@@ -19,15 +19,15 @@ Peer::Peer(
   bool host
 ) : sec(dhms()), sockfd(sock), sockaddr(socka), local(local), host(host) {};
 
-void Peer::Start(std::function<void(Peer*)> h) {
+void Peer::Key_Exchange() {
   // do key exchange [FC]
   try {
     json fco;
     fco["FLAG"] = "KE";
     fco["CONT"] = this->sec.Public();
 
-    this->Raw_Write(fco.dump(), 3000);
-    std::string rs = this->Raw_Read(3000);
+    this->Raw_Write(fco.dump(), this->tout);
+    std::string rs = this->Raw_Read(this->tout);
     auto fci = json::parse(rs);
 
     if (fci["FLAG"] != "KE") {errc("COULD NOT COMPLETE FC");}
@@ -36,7 +36,6 @@ void Peer::Start(std::function<void(Peer*)> h) {
   } catch (...) {
     errc("Peer::Start, Could not complete Key Exchange");
   }
-  h(this);
 }
 
 std::string Peer::Raw_Read(unsigned int t) {

@@ -12,11 +12,13 @@ Session::Session(
   unsigned short port,
   unsigned short queue_limit,
   int sockfd,
-  struct sockaddr_in _self
+  struct sockaddr_in _self,
+  unsigned int timeout
 ) : port(port),
     queue_limit(queue_limit),
     sockfd(sockfd),
-    sockaddr(_self)
+    sockaddr(_self),
+    tout(timeout)
 {};
 
 void Session::Open() {
@@ -30,7 +32,7 @@ std::shared_ptr<Peer> Session::Accept() {
   socklen_t _peerlen;
 
   // start possibly hanging accept
-  Timeout to(3000, this->Socket());
+  Timeout to(this->tout, this->Socket());
   int _peerfd = accept(
     this->sockfd,
     (struct sockaddr*) &_peer,
@@ -56,7 +58,7 @@ std::shared_ptr<Peer> Session::Accept() {
     // local checking
     std::string ips(ip);
     if (ips == "127.0.0.1" || ips == "::1") {f = true;}
-    auto p = std::make_shared<Peer> (_peerfd, _peer, f, true);
+    auto p = std::make_shared<Peer> (_peerfd, _peer, f, true, this->tout);
     return p;
   }
 
@@ -78,7 +80,7 @@ std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
     errc("[CONNECT], COULD NOT CREATE SOCKET");
   }
 
-  Timeout th(3000, this->Socket());
+  Timeout th(this->tout, this->Socket());
   s = gethostbyname(target.substr(0, target.find(":")).data());
   if (s == NULL) {
     th.Cancel();
@@ -96,7 +98,7 @@ std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
   );
 
   // start timeout
-  Timeout to(3000, this->Socket());
+  Timeout to(this->tout, this->Socket());
   if (connect(
     _peerfd,
     (struct sockaddr*) &_peer,
