@@ -22,10 +22,12 @@ linux_lib: $(BIN)linux.o $(OBJ)
 	ar ru $(OFILE).a $^
 	ranlib $(OFILE).a
 	mv *.a exe/
+	cp inc/* exe/inc/
 
 linux_obj: $(BIN)linux.o $(OBJ)
 	$ ld -r $(OBJ) -o $(OFILE).o
 	mv *.o exe/
+	cp inc/* exe/inc/
 
 posix: posix.o $(OBJ)
 	ar ru libuttu.a $^ posix.o
