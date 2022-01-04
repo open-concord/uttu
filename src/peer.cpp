@@ -57,10 +57,18 @@ std::string Peer::Raw_Read(unsigned int t) {
     errc("COULD NOT READ");
   }
   to.Cancel();
+
+  if (b.size() < 1) {
+    errc("ZERO-LENGTH MESSAGE");
+  }
+
   return std::string(b);
 }
 
 void Peer::Raw_Write(std::string m, unsigned int t) {
+  if (m.length() < 1) {
+    errc("ZERO-LENGTH MESSAGE");
+  }
   /** 4 dec place size header */
   std::string so = std::to_string(m.size());
   while (so.size()<4) {
