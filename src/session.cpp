@@ -111,7 +111,7 @@ std::shared_ptr<Peer> Session::Connect(std::string target /** host:port */) {
 
   bool f;
   (target.substr(0, target.find(":")) == "127.0.0.1") ? f = true : f = false;
-  auto p = std::make_shared<Peer>(_peerfd, _peer, f, false);
+  auto p = std::make_shared<Peer>(_peerfd, _peer, f, false, this->tout);
   return p;
 }
 

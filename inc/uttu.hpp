@@ -75,6 +75,7 @@ private:
   // flags
   bool local = false; // local connect? && used in logic loop
   bool host = true;
+  unsigned int tout;
   // raw functions
   std::string Raw_Read(unsigned int t);
   void Raw_Write(std::string m, unsigned int t);
@@ -84,7 +85,7 @@ public:
   bool Local(); // get
   bool Host(); // get
   // Runtime
-  Peer(int sock, struct sockaddr_in socka, bool local, bool host);
+  Peer(int sock, struct sockaddr_in socka, bool local, bool host, unsigned int timeout);
   void Key_Exchange();
   std::string Read(unsigned int t);
   void Write(std::string m, unsigned int t);

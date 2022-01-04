@@ -16,8 +16,9 @@ Peer::Peer(
   int sock,
   struct sockaddr_in socka,
   bool local,
-  bool host
-) : sec(dhms()), sockfd(sock), sockaddr(socka), local(local), host(host) {};
+  bool host,
+  unsigned int timeout
+) : sec(dhms()), sockfd(sock), sockaddr(socka), local(local), host(host), tout(timeout) {};
 
 void Peer::Key_Exchange() {
   // do key exchange [FC]
@@ -58,7 +59,7 @@ std::string Peer::Raw_Read(unsigned int t) {
   }
   to.Cancel();
 
-  if (b.size() < 1) {
+  if (strlen(b) < 1) {
     errc("ZERO-LENGTH MESSAGE");
   }
 
