@@ -29,6 +29,9 @@
 #include <sstream>
 #include <string>
 
+/** outside */
+#include <nlohmann/json.hpp>
+
 /** internal */
 #include "dhm.hpp"
 #include "protocols.hpp"

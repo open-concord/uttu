@@ -4,30 +4,34 @@ LINK = -lpthread -lrt -Wall -lcryptopp
 # compile-time flags
 CFLAGS = -c -g -Wall -fPIC
 
-# convenience variable
-BIN = bin/
-OBJ = $(BIN)err.o \
-			$(BIN)uttu.o \
+# listing build targets
+BIN = build/bin/
+# == protocols ==
+#PROT =
+# == base functionality ==
+OBJ =	$(BIN)uttu.o \
 			$(BIN)timeout.o \
 			$(BIN)peer.o \
-			$(BIN)session.o \
-			$(BIN)sec.o
+			$(BIN)relay.o \
+			$(BIN)sec.o \
+			$(BIN)np.o \
+#			$(PROT)
 
 # target file and install directory
 OFILE = libuttu
-IDIR  = ./exe
+IDIR  = ./build/exe
 
 # build rules
 linux_lib: $(BIN)linux.o $(OBJ)
 	ar ru $(OFILE).a $^
 	ranlib $(OFILE).a
-	mv *.a exe/
-	cp inc/* exe/inc/
+	mv *.a build/exe/
+	cp inc/* build/exe/inc/
 
 linux_obj: $(BIN)linux.o $(OBJ)
 	$ ld -r $(OBJ) -o $(OFILE).o
-	mv *.o exe/
-	cp inc/* exe/inc/
+	mv *.o build/exe/
+	cp inc/* build/exe/inc/
 
 posix: posix.o $(OBJ)
 	ar ru libuttu.a $^ posix.o
@@ -38,18 +42,20 @@ windows: windows.o $(OBJ)
 	ranlib libuttu.a
 
 # functionality implementation files
-$(BIN)timeout.o: inc/uttu.hpp
-	$(CC) $(CFLAGS) src/timeout.cpp -o $@
+$(BIN)np.o: inc/protocols.hpp
+	$(CC) $(CFLAGS) src/np.cpp -o $@
 $(BIN)peer.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/peer.cpp -o $@
-$(BIN)session.o: inc/uttu.hpp
-	$(CC) $(CFLAGS) src/session.cpp -o $@
+$(BIN)relay.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/relay.cpp -o $@
+$(BIN)sec.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/sec.cpp -o $@
+$(BIN)timeout.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/timeout.cpp -o $@
 $(BIN)uttu.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/uttu.cpp -o $@
 $(BIN)err.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/err.cpp -o $@
-$(BIN)sec.o: inc/uttu.hpp
-	$(CC) $(CFLAGS) src/sec.cpp -o $@
 
 # sys dependendent
 $(BIN)linux.o: inc/uttu.hpp
@@ -59,7 +65,14 @@ $(BIN)posix.o: inc/uttu.hpp
 $(BIN)windows.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/api/windows.cpp -o $@
 
+# rebuild (only) protocols
+_protocols: inc/uttu.hpp $(PROT)
+
+# example build rule for protocol
+#$(BIN)csp.o: inc/uttu.hpp protocols/csp/csp.hpp
+#	$(CC) $(CFLAGS) protocols/csp/csp.cpp -o $@
+
 clean:
-	rm -f bin/*.o
-	rm -f exe/*.a
-	rm -f exe/*.o
+	rm -f build/bin/*.o
+	rm -f build/exe/*.a
+	rm -f build/exe/*.o

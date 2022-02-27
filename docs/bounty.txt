@@ -1,0 +1,11 @@
+[ ] terminate crash:
+  rnet crashes sometimes, mostly on terminate called w/o active exception
+  |=> This means that one/some of the threads are going out of scope (e.g. living beyond program)
+  |=> This is most likely due to the new changes w/ Relay::Foward(), which itself is incomplete
+    |=> As a side note/possible solution, std::jthread might be a more applicable implementation (.join is called within its destructor)
+    |=> Another possible solution is doing a similar wrapper to Relay::_Lazy() or Timeout();
+
+[ ] Embedded Logic in Peer
+  Peer::Peer() takes a std::function variable that exists as its 'embedded' logic (scope may change based on function content).
+  Right now, it doesn't actually do anything (it never gets called)
+  |=> This is, of course, a massive TODO, considering the Peer itself is detached from the lib calls.

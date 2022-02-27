@@ -1,21 +1,16 @@
 # uttu
-*~~boost::asio is bloat~~ literally anything other than bytecode is bloat* ~u2on
-
-As such, you should run our bytecode and not ask questions (docs are also bloat)
-
 ---
-## -- custom socket wrapper for Concord>Core --
-Written to streamline networking within concord>core, with raw sockets.
+Written to streamline networking within openconcord/core, with 'raw' sockets.
 
-**Basic usage**
+**a note about compatibility**
 
-`Session`
-  - Represent socket sessions; you use them to connect and accept connections.
-  - The two main funcitons you'll interact with are `Accept` and `Connect`. Both return a `std::share_ptr` to a newly created `Peer` class representing the connection.
-  - You can set the Criteria for accepting new connections based on IP with a void function pointer taking a string to `Critera`
-  - At any time you can `Close` the session, closing the Socket.
+uttu has (thus far) only been tested on linux systems. If you wish to contribute, we're always looking to increase our platform to windows and OSx. Any platform specific code should be implemented in `src/api/<platform>`, while includes should be placed in the precompile headers of `uttu.hpp`.
 
-`Peer`
-  - An abstract class for interactions with a connected peer.
-  - Provides `Read` and `Write` functions.
-  - Can close w/ `Close`.
+#### dependencies / notes
+
+given that (eventually), all oc libraries aren't going to be hosted on the same platform (git-\*), it makes sense to keep some log within the git repo itself.
+
+- All current **known and library wide** issues are stored in [bounty](docs/bounty.txt) 
+- All intended features / the current roadmap are/is stored in [roadmap](docs/roadmap.txt)
+
+uttu relies on the same suite of dependencies as core; ~~nholmann/json and~~ crypto++.

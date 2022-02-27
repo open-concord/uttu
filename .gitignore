@@ -3,3 +3,6 @@
 *.pem
 *.gch
 *.out
+
+exe/*
+bin/*

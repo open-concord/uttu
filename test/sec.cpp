@@ -1,7 +1,5 @@
-#include <uttu.hpp> /** in production <uttu> */
+#include "../inc/uttu.hpp"
 
-
-/** g++ -std=20 -I./../inc -L./../exe -luttu */
 int main () {
   dhms d, p;
 
