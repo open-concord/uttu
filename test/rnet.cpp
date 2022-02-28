@@ -14,17 +14,16 @@ int main(void) {
   np npA;
   Relay r(npA, 1337, 3000, 5);
   r.Open();
-  r.Load(&filler_protocol);
-
+  r.Swap(&filler_protocol);
   r.Lazy(false);
 
   /** connect to relay */
   np npB;
   Peer p0(npB, 1338, 3000);
   p0.Connect("127.0.0.1:1337");
-
   p0.Raw_Write("hello!", 3000);
-
+  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  
   r.Close();
   p0.Close();
   return 0;

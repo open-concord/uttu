@@ -2,7 +2,6 @@
 
 // private
 void Timeout::_async(int t) {
-  // v there's probably a better way to do this
   std::this_thread::sleep_for(std::chrono::milliseconds(t));
   try {
     if (this->_cancel) {
@@ -19,7 +18,7 @@ void Timeout::_async(int t) {
 // public
 Timeout::Timeout(unsigned int t, int s) {
   this->sk = s;
-  this->expire = std::thread(&Timeout::_async, this, t);
+  this->expire = std::jthread(&Timeout::_async, this, t);
   this->expire.detach();
 }
 

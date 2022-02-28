@@ -1,9 +1,17 @@
  #include "../inc/uttu.hpp"
 
-/** == gets == */
+/** == status == */
 
 bool Peer::Host() {
   return this->host;
+}
+
+void Peer::_Wake() {
+  this->logic(this);
+}
+
+void Peer::Swap(std::function<void(Peer*)> l) {
+  this->logic = l;
 }
 
 /** == raw r/w (these should not be called) == */
@@ -65,30 +73,5 @@ Peer::Peer(
   unsigned int timeout,
   std::function<void(Peer*)> l
 ) : net(_net), host(true), tout(timeout), logic(l) {
-  
+
 }
-
-/**
-Peer::Peer() {
-  // TODO: actually check system max
-  if(queue_limit > 5) {errc("QUEUE_LIMIT MUST BE LESS THAN OR EQUAL TO 5");}
-  // initial setup
-  struct sockaddr_in _self;
-
-  int sockfd = socket(AF_INET, SOCK_STREAM, 0); // create socket
-  if(sockfd<0) {errc("COULD NOT OPEN");}
-  bzero((char*) &_self, sizeof(_self)); // zeroing out self_addr buffer
-
-  // sockaddr config(s)
-  _self.sin_family = AF_INET;
-  _self.sin_addr.s_addr = INADDR_ANY;
-  _self.sin_port = htons(port); // made sure to convert to net byte order
-
-  // binding socket
-  if (bind(
-    sockfd,
-    (struct sockaddr*) &_self,
-    sizeof(_self)
-  ) <0) {errc("COULD NOT BIND");} // [ERROR]
-}
-*/

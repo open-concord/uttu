@@ -8,7 +8,7 @@ void Relay::_Lazy(unsigned int life) {
       pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
       poll(pfds, 1, life);
       if (pfds[0].revents == POLLIN) {
-        this->Foward(this->l);
+        this->Foward(this->logic);
       } else {
         break;
       }
@@ -16,7 +16,7 @@ void Relay::_Lazy(unsigned int life) {
     }
     throw;
   } catch (...) {
-    /** destory pollevent please ~u*/
+    /** destroy poll event please ~u*/
     return;
   }
 }
@@ -29,34 +29,30 @@ void Relay::Lazy(bool blocking, unsigned int life) {
   if (blocking) {
     this->_Lazy(life);
   } else {
-    std::thread lt(&Relay::_Lazy, this, life);
+    std::jthread lt(&Relay::_Lazy, this, life);
     lt.detach();
   }
 }
 
 void Relay::Foward(std::function<void(Peer*)> l) {
-	Timeout to(this->tout, this->net.socketfd());
 	/** TODO: there needs to be a way to determine targetted protocol, for now, it's just assumed csp */
 	np _n;
   int t = 3000;
 	/** pulll peer's connection from own queue */
-	_n.queue(this->net.socketfd());
-	to.Cancel();
+  try {
+    _n.queue(this->net.socketfd());
+  } catch(...) {
+    std::cout << "[Relay::Foward] Could not _n.queue()\n";
+    /** couldn't accept (i wonder why ...) */
+  }
 	if (this->_c == nullptr || this->_c(_n.peer_ip())) {
 		/** breakpoint */ std::cout << "before create\n";
-    
-    /** FAILS: std::thread np (
-        [_n, t, l]() -> Peer {
-          return Peer(_n, t, l);
-        });
-    */
+    Peer p(_n, t, l);
+    /** trigger logic manually */
+    std::jthread np(&Peer::_Wake, p);
 		/** breakpoint */ std::cout << "after create\n";
-		//np.detach();
+		np.detach();
 	}
-}
-
-void Relay::Load(std::function<void(Peer*)> l) {
-  this->logic = l;
 }
 
 void Relay::Open() {

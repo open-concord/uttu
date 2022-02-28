@@ -10,7 +10,6 @@
 #include <cryptopp/gcm.h>  // GCM
 #include <cryptopp/hex.h> // HexEncoder/Decoder
 
-using json = nlohmann::json;
 using namespace CryptoPP;
 
 struct dhms { // dhm suite

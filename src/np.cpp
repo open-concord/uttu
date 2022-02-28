@@ -6,7 +6,7 @@ struct sockaddr_in np::_form(int port) {
 
   int _peerfd = socket(this->cfamily, SOCK_STREAM, 0);
   if (_peerfd < 0) {
-    errc("[CONNECT], COULD NOT CREATE SOCKET");
+    errc("[NP::FORM] COULD NOT CREATE SOCKET");
   }
 
   bzero((char*) &_peer, sizeof(_peer));
@@ -23,7 +23,7 @@ void np::target(np::_tf target) {
 
   s = gethostbyname(target.addr.c_str());
   if (s == NULL) {
-    errc("[NP::TARGET], COULD NOT FIND PEER's ADDR");
+    errc("[NP::TARGET] COULD NOT FIND PEER's ADDR");
   }
   struct sockaddr_in _peer = this->_form(target.port);
 
@@ -38,7 +38,7 @@ void np::target(np::_tf target) {
     (struct sockaddr*) &_peer,
     (socklen_t) sizeof(_peer)
   ) < 0) {
-    errc("[NP::TARGET], COULD NOT CONNECT");
+    errc("[NP::TARGET] COULD NOT CONNECT");
   };
   /** TODO: store _peer */
   this->self = _peer;
@@ -49,7 +49,7 @@ void np::queue(int origin_fd) {
   socklen_t _inlen = sizeof(_in);
   int fd = accept(origin_fd, (struct sockaddr *) &_in, &_inlen);
   if (fd < 0) {
-    errc("[NP::QUEUE] Could not accept");
+    errc("[NP::QUEUE] COULD NOT ACCEPT");
   } else {
     this->sockfd = fd;
     this->self = _in;
@@ -58,11 +58,11 @@ void np::queue(int origin_fd) {
 
 void np::port(unsigned short int port) {
   struct sockaddr_in _info = this->_form(port);
-
+  
   if (bind(this->sockfd, (struct sockaddr* ) &_info, sizeof(_info)) < 0) {
-    errc("[NP::PORT] Could not bind");
+    errc("[NP::PORT] COULD NOT BIND");
   }
-
+ 
   /** TODO: store _info */
   this->self = _info;
 }
@@ -119,7 +119,7 @@ void np::writeb(std::string m) {
 
 /** close (no status) */
 void np::closeb() {
-  shutdown(this->sockfd, 2);
+  close(this->sockfd);
 }
 
 np::np() {};

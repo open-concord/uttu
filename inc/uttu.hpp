@@ -35,16 +35,18 @@
 
 struct Peer {
 	protected:
+    unsigned int tout = 3000;
 		std::function<void(Peer*)> logic;
 	public:
 		dhms sec;
 		np net;
 		bool host = true;
-		unsigned int tout;
 
 		/** Raw operations */
 		std::string Raw_Read(unsigned int t);
 		void Raw_Write(std::string m, unsigned int t);
+    void _Wake(); // manually start this->logic
+    void Swap(std::function<void(Peer*)> l); // swap embedded logic
 		/** getters */
     bool Host(); // get
 		/** operations */
@@ -78,10 +80,8 @@ struct Relay : public Peer {
 		void _Lazy(unsigned int life);
     void Foward(std::function<void(Peer*)> l);
 	public:
-    std::function<void(Peer*)> l; /** this isn't actually used by Relay, but is what is loaded into any fowarded Peers */
-		void Criteria(std::function<bool(std::string)> c);
+	  void Criteria(std::function<bool(std::string)> c);
 		void Lazy(bool blocking, unsigned int life = -1);
-		void Load(std::function<void(Peer*)> l);
     void Open();
 		Relay(
         np _net,
@@ -94,7 +94,7 @@ struct Relay : public Peer {
 struct Timeout {
 	private:
 		int sk; // socket to kill on timeout
-		std::thread expire;
+		std::jthread expire;
 		std::atomic<bool> _cancel; // cancel flag
 		void _async(int ft); // inner async loop
 	public:
