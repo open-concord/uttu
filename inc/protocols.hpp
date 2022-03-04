@@ -14,21 +14,21 @@ public:
   } tf; // target format
 
   /** form socket */
-  struct sockaddr_in _form(int port = -1);
+  virtual struct sockaddr_in _form(int port = -1);
 
   /** origin */
-  void target(_tf t);
-  void port(unsigned short int _port);
-  void queue(int origin_fd);
+  virtual void target(_tf t);
+  virtual void port(unsigned short int _port);
+  virtual void queue(int origin_fd);
 
   /** operations */
-  std::string readb();
-  void writeb(std::string m);
-  void closeb();
+  virtual std::string readb();
+  virtual void writeb(std::string m);
+  virtual void closeb();
 
   /** status */
-  int socketfd();
-  std::string peer_ip();
+  virtual int socketfd();
+  virtual std::string peer_ip();
 
   np();
 };

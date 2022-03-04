@@ -58,11 +58,11 @@ void np::queue(int origin_fd) {
 
 void np::port(unsigned short int port) {
   struct sockaddr_in _info = this->_form(port);
-  
+
   if (bind(this->sockfd, (struct sockaddr* ) &_info, sizeof(_info)) < 0) {
     errc("[NP::PORT] COULD NOT BIND");
   }
- 
+
   /** TODO: store _info */
   this->self = _info;
 }
