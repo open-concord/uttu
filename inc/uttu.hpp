@@ -83,7 +83,7 @@ struct Relay : public Peer {
 		void Lazy(bool blocking, unsigned int life = -1);
     void Open();
 		Relay(
-        np _net,
+        std::optional<np> _net,
 				unsigned short int r_port,
 				unsigned int timeout,
 				unsigned short _queul

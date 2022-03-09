@@ -60,7 +60,7 @@ void Relay::Open() {
 }
 
 Relay::Relay(
-  np _net,
+  std::optional<np> _net,
   unsigned short int r_port,
   unsigned int timeout,
   unsigned short _queueL
