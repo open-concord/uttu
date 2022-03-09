@@ -34,14 +34,13 @@
 #include "protocols.hpp"
 
 struct Peer {
-	protected:
-    unsigned int tout = 3000;
-		std::function<void(Peer*)> logic;
 	public:
 		dhms sec;
 		np net;
+    /** pre-filled */
 		bool host = true;
-
+    unsigned int tout;
+    std::function<void(Peer *)> logic;
 		/** Raw operations */
 		std::string Raw_Read(unsigned int t);
 		void Raw_Write(std::string m, unsigned int t);
@@ -57,15 +56,15 @@ struct Peer {
 		void Connect(std::string target); // change socket target
 		/** outgoing initial peer */
 		Peer(
-				np _net,
 				unsigned short int r_port,
-				unsigned int timeout,
+        std::optional<np> _net,
+        unsigned int timeout = 3000,
 				std::function<void(Peer*)> l = nullptr
 		    );
 		/** incoming initial peer */
 		Peer(
-				np _net,
-				unsigned int timeout,
+        std::optional<np> _net,
+				unsigned int timeout = 3000,
 				std::function<void(Peer*)> l = nullptr
 		    );
 };

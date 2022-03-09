@@ -59,19 +59,28 @@ void Peer::Connect(std::string target) {
 
 /** outgoing initial peer */
 Peer::Peer(
-  np _net,
   unsigned short int r_port,
+  std::optional<np> _net,
   unsigned int timeout,
   std::function<void(Peer*)> l
-) : net(_net), host(false), tout(timeout), logic(l) {
+) : host(false), tout(timeout), logic(l) {
+  if (!_net.has_value()) {
+    /** csp */
+    np _pn;
+    this->net = _pn;
+  }
   this->net.port(r_port);
 }
 
 /** incoming initial peer */
 Peer::Peer(
-  np _net,
+  std::optional<np> _net,
   unsigned int timeout,
   std::function<void(Peer*)> l
-) : net(_net), host(true), tout(timeout), logic(l) {
-
+) : host(true), tout(timeout), logic(l) {
+  if (!_net.has_value()) {
+    /** csp */
+    np _pn;
+    this->net = _pn;
+  }
 }
