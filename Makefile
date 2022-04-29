@@ -23,7 +23,7 @@ IDIR  = ./build/exe
 
 # build rules
 linux_lib: $(BIN)linux.o $(OBJ)
-	ar ru $(OFILE).a $^
+	ar cr $(OFILE).a $^
 	ranlib $(OFILE).a
 	mv *.a build/exe/
 	cp inc/* build/exe/inc/
@@ -34,11 +34,11 @@ linux_obj: $(BIN)linux.o $(OBJ)
 	cp inc/* build/exe/inc/
 
 posix: posix.o $(OBJ)
-	ar ru libuttu.a $^ posix.o
+	ar cr libuttu.a $^ posix.o
 	ranlib libuttu.a
 
 windows: windows.o $(OBJ)
-	ar ru libuttu.a $^ windows.o
+	ar cr libuttu.a $^ windows.o
 	ranlib libuttu.a
 
 # functionality implementation files
