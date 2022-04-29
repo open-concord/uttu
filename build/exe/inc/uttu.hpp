@@ -42,15 +42,15 @@ struct Peer {
     unsigned int tout;
     std::function<void(Peer *)> logic;
 		/** Raw operations */
-		std::string Raw_Read(unsigned int t);
-		void Raw_Write(std::string m, unsigned int t);
+		std::string Raw_Read(unsigned int t = 0);
+		void Raw_Write(std::string m, unsigned int t = 0);
     void _Wake(); // manually start this->logic
     void Swap(std::function<void(Peer*)> l); // swap embedded logic
 		/** getters */
     bool Host(); // get
 		/** operations */
-		std::string Read(unsigned int t);
-		void Write(std::string m, unsigned int t);
+		std::string Read(unsigned int t = 0);
+		void Write(std::string m, unsigned int t = 0);
 		/** state */
 		void Close(); // close current socket
 		void Connect(std::string target); // change socket target

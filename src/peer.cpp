@@ -15,7 +15,7 @@ void Peer::Swap(std::function<void(Peer*)> l) {
 }
 
 /** == raw r/w (these should not be called) == */
-std::string Peer::Raw_Read(unsigned int t = 0) {
+std::string Peer::Raw_Read(unsigned int t) {
   if (t < 1) {t = this->tout;}
 
   Timeout to(t, this->net.socketfd());
@@ -24,7 +24,7 @@ std::string Peer::Raw_Read(unsigned int t = 0) {
   return m;
 }
 
-void Peer::Raw_Write(std::string m, unsigned int t = 0) {
+void Peer::Raw_Write(std::string m, unsigned int t) {
   if (t < 1) {t = this->tout;}
 
   Timeout to(t, this->net.socketfd());
@@ -33,13 +33,13 @@ void Peer::Raw_Write(std::string m, unsigned int t = 0) {
 }
 
 /** == abstract r/w  (these should be called) == */
-std::string Peer::Read(unsigned int t = 0) {
+std::string Peer::Read(unsigned int t) {
   if (t < 1) {t = this->tout;}
   
   return this->sec.AD(this->Raw_Read(t));
 }
 
-void Peer::Write(std::string m, unsigned int t = 0) {
+void Peer::Write(std::string m, unsigned int t) {
   if (t < 1) {t = this->tout;}
 
   this->Raw_Write(this->sec.AE(m), t);
