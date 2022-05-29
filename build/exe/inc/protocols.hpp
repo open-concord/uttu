@@ -30,5 +30,5 @@ public:
   virtual int socketfd();
   virtual std::string peer_ip();
 
-  np();
+  virtual ~np() {}
 };

@@ -13,9 +13,7 @@ OBJ =	$(BIN)uttu.o \
 			$(BIN)timeout.o \
 			$(BIN)peer.o \
 			$(BIN)relay.o \
-			$(BIN)sec.o \
-			$(BIN)np.o \
-#			$(PROT)
+			$(BIN)sec.o
 
 # target file and install directory
 OFILE = libuttu
@@ -27,15 +25,18 @@ linux_lib: $(BIN)linux.o $(OBJ)
 	ranlib $(OFILE).a
 	mv *.a build/exe/
 	cp inc/* build/exe/inc/
+	cp protocols/csp/csp.hpp build/exe/inc/.
 
 linux_obj: $(BIN)linux.o $(OBJ)
 	$ ld -r $(OBJ) -o $(OFILE).o
 	mv *.o build/exe/
 	cp inc/* build/exe/inc/
+	cp protocols/csp/csp.hpp build/exe/inc/.
 
 posix: posix.o $(OBJ)
 	ar cr libuttu.a $^ posix.o
 	ranlib libuttu.a
+	cp protocols/csp/csp.hpp build/exe/inc/.
 
 windows: windows.o $(OBJ)
 	ar cr libuttu.a $^ windows.o
@@ -64,13 +65,6 @@ $(BIN)posix.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/api/linux.cpp -o $@
 $(BIN)windows.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/api/windows.cpp -o $@
-
-# rebuild (only) protocols
-_protocols: inc/uttu.hpp $(PROT)
-
-# example build rule for protocol
-#$(BIN)csp.o: inc/uttu.hpp protocols/csp/csp.hpp
-#	$(CC) $(CFLAGS) protocols/csp/csp.cpp -o $@
 
 clean:
 	rm -f build/bin/*.o
