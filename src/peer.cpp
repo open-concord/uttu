@@ -1,4 +1,5 @@
- #include "../inc/uttu.hpp"
+#include "../inc/uttu.hpp"
+#include "../protocols/csp/csp.hpp"
 
 /** == status == */
 
@@ -58,7 +59,7 @@ void Peer::Connect(std::string target) {
   Timeout th(this->tout, this->net.socketfd());
   /** TODO: change based on net protocol */
   this->net.target(
-    np::_tf {a, p}
+    csp::_tf {a, p}
   );
   th.Cancel();
 }
@@ -74,7 +75,7 @@ Peer::Peer(
 ) : host(false), tout(timeout), logic(l) {
   if (!_net.has_value()) {
     /** csp */
-    np _pn;
+    csp _pn;
     this->net = _pn;
   }
   this->net.port(r_port);
@@ -88,7 +89,7 @@ Peer::Peer(
 ) : host(true), tout(timeout), logic(l) {
   if (!_net.has_value()) {
     /** csp */
-    np _pn;
+    csp _pn;
     this->net = _pn;
   }
 }
