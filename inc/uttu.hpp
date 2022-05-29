@@ -36,7 +36,7 @@
 struct Peer {
 	public:
 		dhms sec;
-		np net;
+    np* net;
     /** pre-filled */
 		bool host = true;
     unsigned int tout;
@@ -57,13 +57,13 @@ struct Peer {
 		/** outgoing initial peer */
 		Peer(
 				unsigned short int r_port,
-        std::optional<np> _net,
+        std::optional<np*> _net,
         unsigned int timeout = 3000,
 				std::function<void(Peer*)> l = nullptr
 		    );
 		/** incoming initial peer */
 		Peer(
-        std::optional<np> _net,
+        std::optional<np*> _net,
 				unsigned int timeout = 3000,
 				std::function<void(Peer*)> l = nullptr
 		    );
@@ -83,7 +83,7 @@ struct Relay : public Peer {
 		void Lazy(bool blocking, unsigned int life = -1);
     void Open();
 		Relay(
-        std::optional<np> _net,
+        std::optional<np*> _net,
 				unsigned short int r_port,
 				unsigned int timeout,
 				unsigned short _queul

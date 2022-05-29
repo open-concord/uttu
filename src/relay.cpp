@@ -1,10 +1,11 @@
 #include "../inc/uttu.hpp"
+#include "../protocols/csp/csp.hpp"
 
 void Relay::_Lazy(unsigned int life) {
   try {
     while(!this->close) {
       struct pollfd pfds[1];
-      pfds[0].fd = this->net.socketfd();
+      pfds[0].fd = this->net->socketfd();
       pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
       poll(pfds, 1, life);
       if (pfds[0].revents == POLLIN) {
@@ -36,34 +37,34 @@ void Relay::Lazy(bool blocking, unsigned int life) {
 
 void Relay::Foward(std::function<void(Peer*)> l) {
 	/** TODO: there needs to be a way to determine targetted protocol, for now, it's just assumed csp */
-	np _n;
+	csp _n;
   int t = 3000;
 	/** pulll peer's connection from own queue */
   try {
-    _n.queue(this->net.socketfd());
+    _n.queue(this->net->socketfd());
   } catch(...) {
     std::cout << "[Relay::Foward] Could not _n.queue()\n";
     /** couldn't accept (i wonder why ...) */
   }
 	if (this->_c == nullptr || this->_c(_n.peer_ip())) {
 		/** breakpoint */ std::cout << "before create\n";
-    Peer p(_n, t, l);
+    Peer p(&_n, t, l);
     /** trigger logic manually */
-    std::jthread np(&Peer::_Wake, p);
+    std::jthread pt(&Peer::_Wake, p);
 		/** breakpoint */ std::cout << "after create\n";
-		np.detach();
+		pt.detach();
 	}
 }
 
 void Relay::Open() {
-  listen(this->net.socketfd(), this->queueL);
+  listen(this->net->socketfd(), this->queueL);
 }
 
 Relay::Relay(
-  std::optional<np> _net,
+  std::optional<np*> _net,
   unsigned short int r_port,
   unsigned int timeout,
   unsigned short _queueL
 ) : Peer(_net, timeout), queueL(_queueL) {
-  this->net.port(r_port);
+  this->net->port(r_port);
 }

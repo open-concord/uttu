@@ -19,8 +19,8 @@ void Peer::Swap(std::function<void(Peer*)> l) {
 std::string Peer::Raw_Read(unsigned int t) {
   if (t < 1) {t = this->tout;}
 
-  Timeout to(t, this->net.socketfd());
-  std::string m = this->net.readb();
+  Timeout to(t, this->net->socketfd());
+  std::string m = this->net->readb();
   to.Cancel();
   return m;
 }
@@ -28,8 +28,8 @@ std::string Peer::Raw_Read(unsigned int t) {
 void Peer::Raw_Write(std::string m, unsigned int t) {
   if (t < 1) {t = this->tout;}
 
-  Timeout to(t, this->net.socketfd());
-  this->net.writeb(m);
+  Timeout to(t, this->net->socketfd());
+  this->net->writeb(m);
   to.Cancel();
 }
 
@@ -47,7 +47,7 @@ void Peer::Write(std::string m, unsigned int t) {
 }
 
 void Peer::Close() {
-  this->net.closeb();
+  this->net->closeb();
 }
 
 void Peer::Connect(std::string target) {
@@ -56,9 +56,9 @@ void Peer::Connect(std::string target) {
   std::string a = target.substr(0, target.find(":")).data();
 
   /** change socket target */
-  Timeout th(this->tout, this->net.socketfd());
+  Timeout th(this->tout, this->net->socketfd());
   /** TODO: change based on net protocol */
-  this->net.target(
+  this->net->target(
     csp::_tf {a, p}
   );
   th.Cancel();
@@ -69,27 +69,27 @@ void Peer::Connect(std::string target) {
 /** outgoing initial peer */
 Peer::Peer(
   unsigned short int r_port,
-  std::optional<np> _net,
+  std::optional<np*> _net,
   unsigned int timeout,
   std::function<void(Peer*)> l
 ) : host(false), tout(timeout), logic(l) {
   if (!_net.has_value()) {
     /** csp */
     csp _pn;
-    this->net = _pn;
+    this->net = &_pn;
   }
-  this->net.port(r_port);
+  this->net->port(r_port);
 }
 
 /** incoming initial peer */
 Peer::Peer(
-  std::optional<np> _net,
+  std::optional<np*> _net,
   unsigned int timeout,
   std::function<void(Peer*)> l
 ) : host(true), tout(timeout), logic(l) {
   if (!_net.has_value()) {
     /** csp */
     csp _pn;
-    this->net = _pn;
+    this->net = &_pn;
   }
 }
