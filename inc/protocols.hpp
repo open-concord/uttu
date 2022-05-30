@@ -1,19 +1,18 @@
 #include <string>
 
 /** extendable formatting */
-/** (default definition is the Concord Standard Protocol) */
 struct np {
 protected:
-  struct sockaddr_in self;
+  struct sockaddr_in self = {};
   int cfamily = AF_INET;
-  int sockfd;
+  int sockfd = -1;
 public:
   struct _tf {
     std::string addr;
     unsigned short int port;
   } tf; // target format
 
-  /** form socket */
+  /** form socket */ 
   virtual struct sockaddr_in _form(int port = -1) = 0;
 
   /** origin */
@@ -30,5 +29,5 @@ public:
   virtual int socketfd() = 0;
   virtual std::string peer_ip() = 0;
 
-  virtual ~np() = default; 
+  virtual ~np() = default;
 };

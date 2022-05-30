@@ -1,5 +1,5 @@
 #include "../inc/uttu.hpp"
-#include "../protocols/csp/csp.hpp"
+#include "../proto/csp/inc/csp.hpp"
 
 void Relay::_Lazy(unsigned int life) {
   try {

@@ -1,6 +1,6 @@
 /** concord standard (network) protocol */
 #pragma once
-#include "../../inc/uttu.hpp"
+#include "../../../inc/uttu.hpp"
 
 struct csp : public np {
   struct sockaddr_in _form(int port) override;
@@ -15,5 +15,5 @@ struct csp : public np {
   void writeb(std::string m) override;
   /** close (no status) */
   void closeb() override;
-  ~csp() = default;
+  ~csp() {}
 };

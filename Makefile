@@ -6,14 +6,15 @@ CFLAGS = -c -g -Wall -fPIC
 
 # listing build targets
 BIN = build/bin/
-# == protocols ==
-#PROT =
+
 # == base functionality ==
 OBJ =	$(BIN)uttu.o \
 			$(BIN)timeout.o \
 			$(BIN)peer.o \
 			$(BIN)relay.o \
-			$(BIN)sec.o
+			$(BIN)sec.o \
+			$(BIN)csp.o
+# ^ will find better solution later
 
 # target file and install directory
 OFILE = libuttu
@@ -25,18 +26,15 @@ linux_lib: $(BIN)linux.o $(OBJ)
 	ranlib $(OFILE).a
 	mv *.a build/exe/
 	cp inc/* build/exe/inc/
-	cp protocols/csp/csp.hpp build/exe/inc/.
 
 linux_obj: $(BIN)linux.o $(OBJ)
 	$ ld -r $(OBJ) -o $(OFILE).o
 	mv *.o build/exe/
 	cp inc/* build/exe/inc/
-	cp protocols/csp/csp.hpp build/exe/inc/.
 
 posix: posix.o $(OBJ)
 	ar cr libuttu.a $^ posix.o
 	ranlib libuttu.a
-	cp protocols/csp/csp.hpp build/exe/inc/.
 
 windows: windows.o $(OBJ)
 	ar cr libuttu.a $^ windows.o
@@ -65,6 +63,17 @@ $(BIN)posix.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/api/linux.cpp -o $@
 $(BIN)windows.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/api/windows.cpp -o $@
+
+# build protocols
+#PDIR = proto
+#protocols:
+#	for p in $(PDIR)/*; do \
+#		cd $$p; $(MAKE); cd ..;	\
+#	done
+
+# == temp ==
+$(BIN)csp.o: proto/csp/inc/csp.hpp
+	$(CC) $(CFLAGS) proto/csp/src/csp.cpp -o $@
 
 clean:
 	rm -f build/bin/*.o
