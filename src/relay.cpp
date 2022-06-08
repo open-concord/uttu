@@ -27,12 +27,14 @@ void Relay::Criteria(std::function<bool(std::string)> c = nullptr) {
 }
 
 void Relay::Lazy(bool blocking, unsigned int life) {
+  if (this->Flags.Lazy) {return;}
   if (blocking) {
     this->_Lazy(life);
   } else {
     std::jthread lt(&Relay::_Lazy, this, life);
     lt.detach();
   }
+  this->Flags.Lazy = true;
 }
 
 void Relay::Foward(std::function<void(Peer*)> l) {
@@ -57,7 +59,13 @@ void Relay::Foward(std::function<void(Peer*)> l) {
 }
 
 void Relay::Open() {
-  listen(this->net->socketfd(), this->queueL);
+  if (this->Flags.Open) {return;}
+  try {
+    listen(this->net->socketfd(), this->queueL);
+    this->Flags.Open = true;
+  } catch (std::exception& e) {
+    std::cout << "[!] " << e.what() << '\n';
+  }
 }
 
 Relay::Relay(

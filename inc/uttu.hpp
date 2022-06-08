@@ -38,7 +38,7 @@ struct Peer {
 		dhms sec;
     np* net;
     /** pre-filled */
-		bool host = true;
+    bool host = true;
     unsigned int tout;
     std::function<void(Peer *)> logic;
 		/** Raw operations */
@@ -79,6 +79,10 @@ struct Relay : public Peer {
 		void _Lazy(unsigned int life);
     void Foward(std::function<void(Peer*)> l);
 	public:
+    struct {
+      bool Open = false;
+      bool Lazy = false;
+    } Flags;
 	  void Criteria(std::function<bool(std::string)> c);
 		void Lazy(bool blocking, unsigned int life = -1);
     void Open();
