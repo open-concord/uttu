@@ -73,7 +73,7 @@ Peer::Peer(
   std::optional<np*> _net,
   unsigned int timeout,
   std::function<void(Peer*)> l
-) : tout(timeout), logic(l), FlagManager(3) {
+) : tout(timeout), logic(l), Flags(3) {
   if (!_net.has_value()) {
     std::cout << "[%] No Protocol Passed, assuming CSP\n"; // DEBUG
     /** csp */

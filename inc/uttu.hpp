@@ -44,13 +44,14 @@ public:
   FlagManager(unsigned int);
 };
 
-struct Peer : public virtual FlagManager {
+struct Peer {
 public:
     enum {
       HALTED,
       CLOSE,
       UNTRUSTED
     } FLAGS;
+    FlagManager Flags;
 		dhms sec;
     np* net;
     bool host = false; 
@@ -78,8 +79,14 @@ public:
 };
 
 struct Relay : public Peer {
-	private:
-		/** config */
+  public:
+    FlagManager Flags;	
+    enum {
+      LAZY,
+      OPEN
+    } FLAGS;
+  private:
+    /** config */
 		unsigned short queueL;
 		bool close = false;
 
@@ -87,10 +94,6 @@ struct Relay : public Peer {
 		void _Lazy(unsigned int life);
     void Foward(std::function<void(Peer*)> l);
 	public:
-    struct {
-      bool Open = false;
-      bool Lazy = false;
-    } Flags;
 	  void Criteria(std::function<bool(std::string)> c);
 		void Lazy(bool blocking, unsigned int life = -1);
     void Open();

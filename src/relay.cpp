@@ -27,14 +27,14 @@ void Relay::Criteria(std::function<bool(std::string)> c = nullptr) {
 }
 
 void Relay::Lazy(bool blocking, unsigned int life) {
-  if (this->Flags.Lazy) {return;}
+  if (Flags.GetFlag(LAZY)) {return;}
   if (blocking) {
     this->_Lazy(life);
   } else {
     std::jthread lt(&Relay::_Lazy, this, life);
     lt.detach();
   }
-  this->Flags.Lazy = true;
+  Flags.SetFlag(LAZY, true);
 }
 
 void Relay::Foward(std::function<void(Peer*)> l) {
@@ -42,12 +42,12 @@ void Relay::Foward(std::function<void(Peer*)> l) {
 	int t = 3000;
   /** create peer */
   Peer p(new csp, t, l);
-  p.SetFlag(UNTRUSTED, true);
+  p.Flags.SetFlag(Peer::UNTRUSTED, true);
   /** pull peer's connection from own queue */
   p.net->queue(this->net->socketfd());
  
 	if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
-		p.SetFlag(UNTRUSTED, false);
+		p.Flags.SetFlag(Peer::UNTRUSTED, false);
     /** trigger logic manually */
     std::jthread pt(&Peer::_Wake, p);
 		pt.detach();
@@ -55,10 +55,10 @@ void Relay::Foward(std::function<void(Peer*)> l) {
 }
 
 void Relay::Open() {
-  if (this->Flags.Open) {return;}
+  if (Flags.GetFlag(OPEN)) {return;}
   try {
     listen(this->net->socketfd(), this->queueL);
-    this->Flags.Open = true;
+    Flags.SetFlag(OPEN, true);
   } catch (std::exception& e) {
     std::cout << "[!] " << e.what() << '\n';
   }
@@ -69,7 +69,7 @@ Relay::Relay(
   unsigned short int r_port,
   unsigned int timeout,
   unsigned short _queueL
-) : queueL(_queueL), Peer(_net, timeout), FlagManager(3) {
+) : queueL(_queueL), Peer(_net, timeout), Flags(2) { 
   this->Port(r_port);
   this->host = true; 
 }
