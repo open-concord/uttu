@@ -12,20 +12,17 @@ void filler(Peer* p) {
 
 
 int main(void) {
-  /** open first peer as a relay */ 
-  csp t1;
-  Relay r(&t1, 1337, 3000, 5); 
+  /** open first peer as a relay */
+  Relay r(std::nullopt, 1337, 3000, 5); 
   r.Swap(&filler);
   r.Lazy(false);
   r.Open();
 
   /** connect to relay */
-  csp t2;
-  Peer p(&t2, (unsigned short) 1338);
+  Peer p(std::nullopt, (unsigned short) 1338);
   p.Connect("127.0.0.1:1337");
   p.Raw_Write("hello!", 3000);
-  
-  /** give enough time for both parties to close */
-  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  std::this_thread::sleep_for(std::chrono::milliseconds(20)); // Too fast for its own good :)
+                                                            p.Close();
   return 0;
 }

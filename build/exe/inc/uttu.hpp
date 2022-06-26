@@ -41,7 +41,9 @@ public:
   unsigned int FlagCount();
   void SetFlag(unsigned int, bool);
   bool GetFlag(unsigned int);
-  FlagManager(unsigned int);
+  FlagManager(unsigned int); // null
+  FlagManager(unsigned int, bool); // blanket
+  FlagManager(std::vector<std::pair<int, bool>>); // specific
 };
 
 struct Peer {
@@ -51,7 +53,7 @@ public:
       CLOSE,
       UNTRUSTED
     } FLAGS;
-    FlagManager Flags;
+    FlagManager Flags{3, false};
 		dhms sec;
     np* net;
     bool host = false; 
@@ -80,11 +82,15 @@ public:
 
 struct Relay : public Peer {
   public:
-    FlagManager Flags;	
+    /** this is a really awful solution, but it works for now */
     enum {
+      HALTED,
+      CLOSE,
+      UNTRUSTED,
       LAZY,
-      OPEN
-    } FLAGS;
+      OPEN 
+    } FLAGS; 
+    FlagManager Flags{5, false}; 
   private:
     /** config */
 		unsigned short queueL;

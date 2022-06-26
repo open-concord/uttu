@@ -3,6 +3,4 @@
 *.pem
 *.gch
 *.out
-
-exe/*
-bin/*
+build/*

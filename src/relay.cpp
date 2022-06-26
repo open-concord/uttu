@@ -3,7 +3,7 @@
 
 void Relay::_Lazy(unsigned int life) {
   try {
-    while(!this->close) {
+    while(!Flags.GetFlag(CLOSE)) {
       struct pollfd pfds[1];
       pfds[0].fd = this->net->socketfd();
       pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
@@ -41,13 +41,13 @@ void Relay::Foward(std::function<void(Peer*)> l) {
 	/** TODO: there needs to be a way to determine targetted protocol, for now, it's just assumed csp */
 	int t = 3000;
   /** create peer */
-  Peer p(new csp, t, l);
-  p.Flags.SetFlag(Peer::UNTRUSTED, true);
+  Peer p(new csp, t, l); 
+  p.Flags.SetFlag(UNTRUSTED, true);
   /** pull peer's connection from own queue */
   p.net->queue(this->net->socketfd());
  
 	if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
-		p.Flags.SetFlag(Peer::UNTRUSTED, false);
+		p.Flags.SetFlag(UNTRUSTED, false);
     /** trigger logic manually */
     std::jthread pt(&Peer::_Wake, p);
 		pt.detach();
@@ -69,7 +69,7 @@ Relay::Relay(
   unsigned short int r_port,
   unsigned int timeout,
   unsigned short _queueL
-) : queueL(_queueL), Peer(_net, timeout), Flags(2) { 
+) : queueL(_queueL), Peer(_net, timeout) {  
   this->Port(r_port);
   this->host = true; 
 }

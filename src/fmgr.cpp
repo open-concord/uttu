@@ -27,3 +27,16 @@ bool FlagManager::GetFlag(unsigned int index) {
 FlagManager::FlagManager(unsigned int size) {
   this->flags.resize(size);
 }
+FlagManager::FlagManager(unsigned int size, bool state) {
+  this->flags.resize(size);
+  for (const auto& f: this->flags) {
+    this->flags.at(f) = state;
+  }
+}
+FlagManager::FlagManager(std::vector<std::pair<int, bool>> initset) {
+  this->flags.resize(initset.size());
+  for (auto& [f, s]: initset) {
+    this->SetFlag(f, s);
+  }
+}
+  

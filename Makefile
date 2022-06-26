@@ -22,15 +22,10 @@ OFILE = libuttu
 IDIR  = ./build/exe
 
 # build rules
-linux_lib: $(BIN)linux.o $(OBJ)
+linux: $(BIN)linux.o $(OBJ)
 	ar cr $(OFILE).a $^
 	ranlib $(OFILE).a
 	mv *.a build/exe/
-	cp inc/* build/exe/inc/
-
-linux_obj: $(BIN)linux.o $(OBJ)
-	$ ld -r $(OBJ) -o $(OFILE).o
-	mv *.o build/exe/
 	cp inc/* build/exe/inc/
 
 posix: posix.o $(OBJ)
