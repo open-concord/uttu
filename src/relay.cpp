@@ -37,23 +37,30 @@ void Relay::Lazy(bool blocking, unsigned int life) {
   this->Flags.Lazy = true;
 }
 
+/** When I invoke the CSP ownership directly to a peer, there's no issues; it's only when a Peer is created off a Relay that the pure virtual error is thrown.
+ *
+ * Possible Casues;
+ * - Peer doesn't own csp, because of the way that we pull from queue first, possibly b/c of the way we handle multithreading.
+ * -- e.g. the csp initialised in Relay::Foward is destroyed.
+ * -- hence we need to move ownership of the derived np type without removing it.
+ * -- the current design needs to be moved around; Peer needs to be initialised with new csp, not a reference to a destroyed csp.
+ * -- The only issue is that the criteria check would expose a Peer, and maybe open up the host system to attack, before the Peer could be stopped.
+ * -- This would be solved by the extension of the Flag system present in core to uttu.  
+ */
+
 void Relay::Foward(std::function<void(Peer*)> l) {
 	/** TODO: there needs to be a way to determine targetted protocol, for now, it's just assumed csp */
-	csp _n;
-  int t = 3000;
-	/** pulll peer's connection from own queue */
-  try {
-    _n.queue(this->net->socketfd());
-  } catch(...) {
-    std::cout << "[Relay::Foward] Could not _n.queue()\n";
-    /** couldn't accept (i wonder why ...) */
-  }
-	if (this->_c == nullptr || this->_c(_n.peer_ip())) {
-		/** breakpoint */ std::cout << "before create\n";
-    Peer p(&_n, t, l);
+	int t = 3000;
+  /** create peer */
+  Peer p(new csp, t, l);
+  p.SetFlag(UNTRUSTED, true);
+  /** pull peer's connection from own queue */
+  p.net->queue(this->net->socketfd());
+ 
+	if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
+		p.SetFlag(UNTRUSTED, false);
     /** trigger logic manually */
     std::jthread pt(&Peer::_Wake, p);
-		/** breakpoint */ std::cout << "after create\n";
 		pt.detach();
 	}
 }
@@ -73,6 +80,7 @@ Relay::Relay(
   unsigned short int r_port,
   unsigned int timeout,
   unsigned short _queueL
-) : Peer(_net, timeout), queueL(_queueL) {
-  this->net->port(r_port);
+) : queueL(_queueL), Peer(_net, timeout), FlagManager(3) {
+  this->Port(r_port);
+  this->host = true; 
 }

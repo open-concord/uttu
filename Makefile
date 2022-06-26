@@ -13,6 +13,7 @@ OBJ =	$(BIN)uttu.o \
 			$(BIN)peer.o \
 			$(BIN)relay.o \
 			$(BIN)sec.o \
+			$(BIN)fmgr.o \
 			$(BIN)csp.o
 # ^ will find better solution later
 
@@ -55,6 +56,9 @@ $(BIN)uttu.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/uttu.cpp -o $@
 $(BIN)err.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/err.cpp -o $@
+$(BIN)fmgr.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/fmgr.cpp -o $@
+
 
 # sys dependendent
 $(BIN)linux.o: inc/uttu.hpp

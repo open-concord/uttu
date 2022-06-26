@@ -2,7 +2,7 @@
 #pragma once
 #include "../../../inc/uttu.hpp"
 
-struct csp : public np {
+struct csp : public virtual np {
   struct sockaddr_in _form(int port) override;
   void target(_tf target) override;
   void queue(int origin_fd) override;

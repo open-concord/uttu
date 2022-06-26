@@ -1,10 +1,15 @@
-
+INC = -I./../build/exe/inc
 LINK = -L./../build/exe -luttu -lpthread -lcryptopp
 
-# r net
-r: ../inc/uttu.hpp
-	g++ -std=c++20 rnet.cpp -o r.out $(LINK)
+GCC = g++ -std=c++20
+# net
+n:
+	$(GCC) $(INC) net.cpp -o bin/n.out $(LINK)
 
 # sec
-s: ../inc/uttu.hpp
-	g++ -std=c++20 sec.cpp -o s.out $(LINK)
+s:
+	$(GCC) $(INC) sec.cpp -o bin/s.out $(LINK)
+	
+# protocol
+p:
+	$(GCC) $(INC) prot.cpp -o bin/p.out $(LINK)

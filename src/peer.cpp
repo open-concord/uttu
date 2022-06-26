@@ -11,6 +11,10 @@ void Peer::_Wake() {
   this->logic(this);
 }
 
+void Peer::Port(unsigned int p) {
+  this->net->port(p);
+}
+
 void Peer::Swap(std::function<void(Peer*)> l) {
   this->logic = l;
 }
@@ -65,31 +69,15 @@ void Peer::Connect(std::string target) {
 }
 
 /** WIP: Make Peer bootstrappable */
-
-/** outgoing initial peer */
-Peer::Peer(
-  unsigned short int r_port,
-  std::optional<np*> _net,
-  unsigned int timeout,
-  std::function<void(Peer*)> l
-) : host(false), tout(timeout), logic(l) {
-  if (!_net.has_value()) {
-    /** csp */
-    csp _pn;
-    this->net = &_pn;
-  } else {this->net = _net.value();}
-  this->net->port(r_port);
-}
-
-/** incoming initial peer */
 Peer::Peer(
   std::optional<np*> _net,
   unsigned int timeout,
   std::function<void(Peer*)> l
-) : host(true), tout(timeout), logic(l) {
+) : tout(timeout), logic(l), FlagManager(3) {
   if (!_net.has_value()) {
+    std::cout << "[%] No Protocol Passed, assuming CSP\n"; // DEBUG
     /** csp */
-    csp _pn;
-    this->net = &_pn;
-  } else {this->net = _net.value();}
+    this->net = new csp;
+  } else {this->net = _net.value();} 
 }
+

@@ -33,12 +33,27 @@
 #include "dhm.hpp"
 #include "protocols.hpp"
 
-struct Peer {
-	public:
+struct FlagManager {
+/** flags */
+protected:
+  std::vector<bool> flags;
+public:
+  unsigned int FlagCount();
+  void SetFlag(unsigned int, bool);
+  bool GetFlag(unsigned int);
+  FlagManager(unsigned int);
+};
+
+struct Peer : public virtual FlagManager {
+public:
+    enum {
+      HALTED,
+      CLOSE,
+      UNTRUSTED
+    } FLAGS;
 		dhms sec;
     np* net;
-    /** pre-filled */
-    bool host = true;
+    bool host = false; 
     unsigned int tout;
     std::function<void(Peer *)> logic;
 		/** Raw operations */
@@ -46,22 +61,15 @@ struct Peer {
 		void Raw_Write(std::string m, unsigned int t = 0);
     void _Wake(); // manually start this->logic
     void Swap(std::function<void(Peer*)> l); // swap embedded logic
-		/** getters */
+    void Port(unsigned int);
+    /** getters */
     bool Host(); // get
 		/** operations */
 		std::string Read(unsigned int t = 0);
 		void Write(std::string m, unsigned int t = 0);
 		/** state */
 		void Close(); // close current socket
-		void Connect(std::string target); // change socket target
-		/** outgoing initial peer */
-		Peer(
-				unsigned short int r_port,
-        std::optional<np*> _net,
-        unsigned int timeout = 3000,
-				std::function<void(Peer*)> l = nullptr
-		    );
-		/** incoming initial peer */
+		void Connect(std::string target); // change socket target	
 		Peer(
         std::optional<np*> _net,
 				unsigned int timeout = 3000,
