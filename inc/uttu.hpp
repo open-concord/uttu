@@ -61,7 +61,7 @@ public:
     } FLAGS;
     FlagManager Flags;
     /** flag template */
-    FlagManager::PRETAPE FLAG_TEMP {4, false};
+    FlagManager::PRETAPE FLAGT {4, false};
 		dhms sec;
     np* net;
     unsigned int tout;
@@ -96,7 +96,7 @@ struct Relay : public Peer {
       CLOSE
     } FLAGS; 
     FlagManager Flags;
-    std::pair<unsigned int, bool> FLAG_TEMP {3, false};
+    std::pair<unsigned int, bool> FLAGT {3, false};
   private:
     /** config */
 		unsigned short queueL;	
