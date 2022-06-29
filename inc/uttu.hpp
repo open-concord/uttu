@@ -36,14 +36,14 @@
 struct FlagManager {
 /** flags */
 protected:
-  std::vector<bool> flags;
+  std::vector<std::vector<bool>> ftape;
 public:
-  unsigned int FlagCount();
-  void SetFlag(unsigned int, bool);
-  bool GetFlag(unsigned int);
+  unsigned int FlagCount(unsigned int);
+  void SetFlag(unsigned int, bool, unsigned int = 0);
+  bool GetFlag(unsigned int, unsigned int = 0);
   FlagManager(unsigned int); // null
-  FlagManager(unsigned int, bool); // blanket
-  FlagManager(std::vector<std::pair<int, bool>>); // specific
+  FlagManager(std::vector<std::pair<unsigned int, bool>>); // blanket
+  FlagManager(std::vector<std::vector<bool>>); // literal 
 };
 
 struct Peer {
@@ -51,12 +51,12 @@ public:
     enum {
       HALTED,
       CLOSE,
-      UNTRUSTED
+      UNTRUSTED,
+      HOST
     } FLAGS;
-    FlagManager Flags{3, false};
+    FlagManager Flags;
 		dhms sec;
     np* net;
-    bool host = false; 
     unsigned int tout;
     std::function<void(Peer *)> logic;
 		/** Raw operations */
@@ -84,17 +84,14 @@ struct Relay : public Peer {
   public:
     /** this is a really awful solution, but it works for now */
     enum {
-      HALTED,
-      CLOSE,
-      UNTRUSTED,
       LAZY,
-      OPEN 
+      OPEN,
+      CLOSE
     } FLAGS; 
-    FlagManager Flags{5, false}; 
+    FlagManager Flags; 
   private:
     /** config */
-		unsigned short queueL;
-		bool close = false;
+		unsigned short queueL;	
 
 		std::function<bool(std::string)> _c = nullptr;
 		void _Lazy(unsigned int life);

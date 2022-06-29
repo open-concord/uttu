@@ -3,7 +3,7 @@
 
 void Relay::_Lazy(unsigned int life) {
   try {
-    while(!Flags.GetFlag(CLOSE)) {
+    while(!Flags.GetFlag(Relay::CLOSE, 1)) {
       struct pollfd pfds[1];
       pfds[0].fd = this->net->socketfd();
       pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
@@ -27,14 +27,14 @@ void Relay::Criteria(std::function<bool(std::string)> c = nullptr) {
 }
 
 void Relay::Lazy(bool blocking, unsigned int life) {
-  if (Flags.GetFlag(LAZY)) {return;}
+  if (Flags.GetFlag(Relay::LAZY, 1)) {return;}
   if (blocking) {
     this->_Lazy(life);
   } else {
     std::jthread lt(&Relay::_Lazy, this, life);
     lt.detach();
   }
-  Flags.SetFlag(LAZY, true);
+  Flags.SetFlag(Relay::LAZY, true, 1);
 }
 
 void Relay::Foward(std::function<void(Peer*)> l) {
@@ -42,12 +42,12 @@ void Relay::Foward(std::function<void(Peer*)> l) {
 	int t = 3000;
   /** create peer */
   Peer p(new csp, t, l); 
-  p.Flags.SetFlag(UNTRUSTED, true);
+  p.Flags.SetFlag(Peer::UNTRUSTED, true);
   /** pull peer's connection from own queue */
   p.net->queue(this->net->socketfd());
  
 	if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
-		p.Flags.SetFlag(UNTRUSTED, false);
+		p.Flags.SetFlag(Peer::UNTRUSTED, false);
     /** trigger logic manually */
     std::jthread pt(&Peer::_Wake, p);
 		pt.detach();
@@ -55,10 +55,10 @@ void Relay::Foward(std::function<void(Peer*)> l) {
 }
 
 void Relay::Open() {
-  if (Flags.GetFlag(OPEN)) {return;}
+  if (Flags.GetFlag(1, Relay::OPEN)) {return;}
   try {
     listen(this->net->socketfd(), this->queueL);
-    Flags.SetFlag(OPEN, true);
+    Flags.SetFlag(1, Relay::OPEN, true);
   } catch (std::exception& e) {
     std::cout << "[!] " << e.what() << '\n';
   }
@@ -69,7 +69,8 @@ Relay::Relay(
   unsigned short int r_port,
   unsigned int timeout,
   unsigned short _queueL
-) : queueL(_queueL), Peer(_net, timeout) {  
+) : queueL(_queueL), Peer(_net, timeout), 
+  Flags(std::vector<std::pair<unsigned int, bool>>{{3, false}}) {  
   this->Port(r_port);
-  this->host = true; 
+  this->Flags.SetFlag(Peer::HOST, true); 
 }

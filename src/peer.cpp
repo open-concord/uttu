@@ -4,7 +4,7 @@
 /** == status == */
 
 bool Peer::Host() {
-  return this->host;
+  return this->Flags.GetFlag(Peer::HOST);
 }
 
 void Peer::_Wake() {
@@ -73,7 +73,8 @@ Peer::Peer(
   std::optional<np*> _net,
   unsigned int timeout,
   std::function<void(Peer*)> l
-) : tout(timeout), logic(l) {
+) : tout(timeout), logic(l), 
+  Flags(std::vector<std::pair<unsigned int, bool>>{{4, false}}) {
   Flags.SetFlag(Peer::CLOSE, false);
   if (!_net.has_value()) {
     std::cout << "[%] No Protocol Passed, assuming CSP\n"; // DEBUG
