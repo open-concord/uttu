@@ -11,7 +11,10 @@ void FlagManager::SetFlag(
     ) {
   try {
     auto flags = this->ftape.at(tindex);
-    if (flags.size() < index) {throw "Out of Bounds       Set";}
+    if (flags.size() < index) {
+      std::cout << "[Warn] Out of Bounds Set\n";
+      flags.resize(index+1);
+    }
     flags.at(index) = state;
   } catch(const char* cem) {
     std::cout << "[!] " << cem << '\n';
@@ -37,7 +40,16 @@ FlagManager::FlagManager(unsigned int tcount) {
   this->ftape.resize(tcount);
 }
 
-FlagManager::FlagManager(std::vector<std::pair<unsigned int, bool>> fttemp) {
+FlagManager::FlagManager(PRETAPE ftemp) {
+  auto fcount = std::get<0>(ftemp);
+  auto state = std::get<1>(ftemp);
+  this->ftape.at(0).resize(fcount);
+  for (unsigned int j=0; j<fcount; j++) {
+    this->ftape.at(0).at(j) = state;
+  }
+}
+
+FlagManager::FlagManager(std::vector<PRETAPE> fttemp) {
   for (unsigned int i=0; i<fttemp.size(); i++) {
     auto fcount = std::get<0>(fttemp.at(i));
     auto state = std::get<1>(fttemp.at(i));
@@ -48,7 +60,7 @@ FlagManager::FlagManager(std::vector<std::pair<unsigned int, bool>> fttemp) {
   } 
 }
 
-FlagManager::FlagManager(std::vector<std::vector<bool>> fttemp) {
+FlagManager::FlagManager(std::vector<TAPE> fttemp) {
   for (unsigned int i=0; i<fttemp.size(); i++) {
     this->ftape.at(i) = fttemp.at(i);
   }

@@ -34,6 +34,10 @@
 #include "protocols.hpp"
 
 struct FlagManager {
+public:
+  /** QoL */
+  using PRETAPE = std::pair<unsigned int, bool>;
+  using TAPE = std::vector<bool>;
 /** flags */
 protected:
   std::vector<std::vector<bool>> ftape;
@@ -41,9 +45,10 @@ public:
   unsigned int FlagCount(unsigned int);
   void SetFlag(unsigned int, bool, unsigned int = 0);
   bool GetFlag(unsigned int, unsigned int = 0);
-  FlagManager(unsigned int); // null
-  FlagManager(std::vector<std::pair<unsigned int, bool>>); // blanket
-  FlagManager(std::vector<std::vector<bool>>); // literal 
+  FlagManager(unsigned int); // count of tapes only
+  FlagManager(FlagManager::PRETAPE); // solo
+  FlagManager(std::vector<FlagManager::PRETAPE>); // blanket 
+  FlagManager(std::vector<FlagManager::TAPE>); // literal 
 };
 
 struct Peer {
@@ -55,6 +60,8 @@ public:
       HOST
     } FLAGS;
     FlagManager Flags;
+    /** flag template */
+    FlagManager::PRETAPE FLAG_TEMP {4, false};
 		dhms sec;
     np* net;
     unsigned int tout;
@@ -88,7 +95,8 @@ struct Relay : public Peer {
       OPEN,
       CLOSE
     } FLAGS; 
-    FlagManager Flags; 
+    FlagManager Flags;
+    std::pair<unsigned int, bool> FLAG_TEMP {3, false};
   private:
     /** config */
 		unsigned short queueL;	

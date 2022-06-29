@@ -70,7 +70,7 @@ Relay::Relay(
   unsigned int timeout,
   unsigned short _queueL
 ) : queueL(_queueL), Peer(_net, timeout), 
-  Flags(std::vector<std::pair<unsigned int, bool>>{{3, false}}) {  
+  Flags(std::vector<FlagManager::PRETAPE>{Peer::FLAG_TEMP, Relay::FLAG_TEMP}) {  
   this->Port(r_port);
   this->Flags.SetFlag(Peer::HOST, true); 
 }
