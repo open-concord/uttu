@@ -61,8 +61,8 @@ public:
     } FLAGS;
     FlagManager Flags;
     /** flag template */
-    FlagManager::PRETAPE FLAGT {4, false};
-		dhms sec;
+    FlagManager::PRETAPE FLAGT = FlagManager::PRETAPE {4, false};
+    dhms sec;
     np* net;
     unsigned int tout;
     std::function<void(Peer *)> logic;
@@ -96,7 +96,7 @@ struct Relay : public Peer {
       CLOSE
     } FLAGS; 
     FlagManager Flags;
-    std::pair<unsigned int, bool> FLAGT {3, false};
+    FlagManager::PRETAPE FLAGT = FlagManager::PRETAPE {3, false};
   private:
     /** config */
 		unsigned short queueL;	
