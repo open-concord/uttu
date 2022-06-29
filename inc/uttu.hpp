@@ -51,7 +51,7 @@ public:
   FlagManager(std::vector<FlagManager::TAPE>); // literal 
 };
 
-namespace FTEMP {
+namespace UFTEMP {
   FlagManager::PRETAPE Peer {4, false};
   FlagManager::PRETAPE Relay {3, false}; 
 };
