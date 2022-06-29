@@ -3,4 +3,4 @@
 *.pem
 *.gch
 *.out
-build/*
+build/*/*
