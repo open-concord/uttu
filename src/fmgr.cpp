@@ -43,6 +43,7 @@ FlagManager::FlagManager(unsigned int tcount) {
 FlagManager::FlagManager(PRETAPE ftemp) {
   auto fcount = std::get<0>(ftemp);
   auto state = std::get<1>(ftemp);
+  this->ftape.resize(1);
   this->ftape.at(0).resize(fcount);
   for (unsigned int j=0; j<fcount; j++) {
     this->ftape.at(0).at(j) = state;
@@ -50,6 +51,7 @@ FlagManager::FlagManager(PRETAPE ftemp) {
 }
 
 FlagManager::FlagManager(std::vector<PRETAPE> fttemp) {
+  this->ftape.resize(fttemp.size());
   for (unsigned int i=0; i<fttemp.size(); i++) {
     auto fcount = std::get<0>(fttemp.at(i));
     auto state = std::get<1>(fttemp.at(i));
@@ -61,6 +63,7 @@ FlagManager::FlagManager(std::vector<PRETAPE> fttemp) {
 }
 
 FlagManager::FlagManager(std::vector<TAPE> fttemp) {
+  this->ftape.resize(1);
   for (unsigned int i=0; i<fttemp.size(); i++) {
     this->ftape.at(i) = fttemp.at(i);
   }
