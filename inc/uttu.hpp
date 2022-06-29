@@ -51,6 +51,11 @@ public:
   FlagManager(std::vector<FlagManager::TAPE>); // literal 
 };
 
+namespace FTEMP {
+  FlagManager::PRETAPE Peer {4, false};
+  FlagManager::PRETAPE Relay {3, false}; 
+};
+
 struct Peer {
 public:
     enum {
@@ -60,8 +65,7 @@ public:
       HOST
     } FLAGS;
     FlagManager Flags;
-    /** flag template */
-    FlagManager::PRETAPE FLAGT = FlagManager::PRETAPE {4, false};
+
     dhms sec;
     np* net;
     unsigned int tout;
@@ -88,15 +92,13 @@ public:
 };
 
 struct Relay : public Peer {
-  public:
-    /** this is a really awful solution, but it works for now */
+  public: 
     enum {
       LAZY,
       OPEN,
       CLOSE
     } FLAGS; 
     FlagManager Flags;
-    FlagManager::PRETAPE FLAGT = FlagManager::PRETAPE {3, false};
   private:
     /** config */
 		unsigned short queueL;	

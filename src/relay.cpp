@@ -69,7 +69,7 @@ Relay::Relay(
   unsigned short int r_port,
   unsigned int timeout,
   unsigned short _queueL
-) : Peer(_net, timeout), Flags(std::vector<FlagManager::PRETAPE>{Peer::FLAGT, Relay::FLAGT}), queueL(_queueL) {  
+) : Peer(_net, timeout), Flags(std::vector<FlagManager::PRETAPE>{FTEMP::Peer, FTEMP::Relay}), queueL(_queueL) {  
   this->Port(r_port);
   this->Flags.SetFlag(Peer::HOST, true); 
 }

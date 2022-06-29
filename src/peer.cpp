@@ -73,7 +73,7 @@ Peer::Peer(
   std::optional<np*> _net,
   unsigned int timeout,
   std::function<void(Peer*)> l
-) : Flags(Peer::FLAGT), tout(timeout), logic(l) {
+) : Flags(FTEMP::Peer), tout(timeout), logic(l) {
   Flags.SetFlag(Peer::CLOSE, false);
   if (!_net.has_value()) {
     std::cout << "[%] No Protocol Passed, assuming CSP\n"; // DEBUG
