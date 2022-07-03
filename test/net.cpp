@@ -1,5 +1,6 @@
 #include "../inc/uttu.hpp"
 #include "../proto/csp/inc/csp.hpp"
+#include <optional>
 
 void filler(Peer* p) {
   std::cout << "got new peer\n";
@@ -13,16 +14,17 @@ void filler(Peer* p) {
 
 int main(void) {
   /** open first peer as a relay */
-  Relay r(std::nullopt, 1337, 3000, 5); 
-  r.Swap(&filler);
-  r.Lazy(false);
-  r.Open();
+  //Relay r(std::nullopt, 1337, 3000, 5); 
+  //r.Swap(&filler);
+  //r.Lazy(false);
+  //r.Open();
 
   /** connect to relay */
   Peer p(std::nullopt, (unsigned short) 1338);
-  p.Connect("127.0.0.1:1337");
+  p.Connect("68.84.7.154:1337");
   p.Raw_Write("hello!", 3000);
   std::this_thread::sleep_for(std::chrono::milliseconds(20)); // Too fast for its own good :)
-                                                            p.Close();
+  p.Close();
+  std::cout << "all done!\n";
   return 0;
 }

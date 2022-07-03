@@ -9,7 +9,7 @@ void Relay::_Lazy(unsigned int life) {
       pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
       poll(pfds, 1, life);
       if (pfds[0].revents == POLLIN) {
-        this->Foward(this->logic);
+        this->Foward();
       } else {
         break;
       }
@@ -22,7 +22,11 @@ void Relay::_Lazy(unsigned int life) {
   }
 }
 
-void Relay::Criteria(std::function<bool(std::string)> c = nullptr) {
+void Relay::Embed(std::function<void(Peer)> e) {
+  this->_e = e;
+}
+
+void Relay::Criteria(std::function<bool(std::string)> c) {
   this->_c = c;
 }
 
@@ -37,20 +41,17 @@ void Relay::Lazy(bool blocking, unsigned int life) {
   Flags.SetFlag(Relay::LAZY, true, 1);
 }
 
-void Relay::Foward(std::function<void(Peer*)> l) {
-	/** TODO: there needs to be a way to determine targetted protocol, for now, it's just assumed csp */
+void Relay::Foward() {	
 	int t = 3000;
   /** create peer */
-  Peer p(new csp, t, l); 
+  Peer p(new csp, t); 
   p.Flags.SetFlag(Peer::UNTRUSTED, true);
   /** pull peer's connection from own queue */
   p.net->queue(this->net->socketfd());
  
 	if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
 		p.Flags.SetFlag(Peer::UNTRUSTED, false);
-    /** trigger logic manually */
-    std::jthread pt(&Peer::_Wake, p);
-		pt.detach();
+    this->_e(std::move(p));
 	}
 }
 
@@ -62,6 +63,11 @@ void Relay::Open() {
   } catch (std::exception& e) {
     std::cout << "[!] " << e.what() << '\n';
   }
+}
+
+void Relay::Close() {
+  this->Flags.SetFlag(Relay::CLOSE, true, 1);
+  this->net->closeb();
 }
 
 Relay::Relay(

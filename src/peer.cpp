@@ -7,16 +7,8 @@ bool Peer::Host() {
   return this->Flags.GetFlag(Peer::HOST);
 }
 
-void Peer::_Wake() {
-  this->logic(this);
-}
-
 void Peer::Port(unsigned int p) {
   this->net->port(p);
-}
-
-void Peer::Swap(std::function<void(Peer*)> l) {
-  this->logic = l;
 }
 
 /** == raw r/w (these should not be called) == */
@@ -54,16 +46,12 @@ void Peer::Close() {
   this->net->closeb();
 }
 
-void Peer::Connect(std::string target) {
-  /** input parse */
-  unsigned short p = atoi(target.substr((target.find(":")+1)).data()); // delimter->end;
-  std::string a = target.substr(0, target.find(":")).data();
-
+void Peer::Connect(std::string ip, unsigned short int port) {
   /** change socket target */
   Timeout th(this->tout, this->net->socketfd());
   /** TODO: change based on net protocol */
   this->net->target(
-    np::_tf {a, p}
+    np::_tf {ip, port}
   );
   th.Cancel();
 }
@@ -71,9 +59,8 @@ void Peer::Connect(std::string target) {
 /** WIP: Make Peer bootstrappable */
 Peer::Peer(
   std::optional<np*> _net,
-  unsigned int timeout,
-  std::function<void(Peer*)> l
-) : Flags(UFTEMP::Peer), tout(timeout), logic(l) {
+  unsigned int timeout
+) : Flags(UFTEMP::Peer), tout(timeout) {
   Flags.SetFlag(Peer::CLOSE, false);
   if (!_net.has_value()) {
     std::cout << "[%] No Protocol Passed, assuming CSP\n"; // DEBUG

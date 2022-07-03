@@ -71,13 +71,10 @@ public:
 
     dhms sec;
     np* net;
-    unsigned int tout;
-    std::function<void(Peer *)> logic;
+    unsigned int tout; 
 		/** Raw operations */
 		std::string Raw_Read(unsigned int t = 0);
 		void Raw_Write(std::string m, unsigned int t = 0);
-    void _Wake(); // manually start this->logic
-    void Swap(std::function<void(Peer*)> l); // swap embedded logic
     void Port(unsigned int);
     /** getters */
     bool Host(); // get
@@ -86,11 +83,10 @@ public:
 		void Write(std::string m, unsigned int t = 0);
 		/** state */
 		void Close(); // close current socket
-		void Connect(std::string target); // change socket target	
+		void Connect(std::string ip, unsigned short int port); // change socket target	
 		Peer(
         std::optional<np*> _net,
-				unsigned int timeout = 3000,
-				std::function<void(Peer*)> l = nullptr
+				unsigned int timeout = 3000
 		    );
 };
 
@@ -106,13 +102,16 @@ struct Relay : public Peer {
     /** config */
 		unsigned short queueL;	
 
-		std::function<bool(std::string)> _c = nullptr;
+		std::function<bool(std::string)> _c = nullptr; // criteria
+    std::function<void(Peer)> _e = nullptr; // embedded logic (for Peer foward) (assumes responsibility for Peer)
 		void _Lazy(unsigned int life);
-    void Foward(std::function<void(Peer*)> l);
+    void Foward();
 	public:
+    void Embed(std::function<void(Peer)> p);
 	  void Criteria(std::function<bool(std::string)> c);
 		void Lazy(bool blocking, unsigned int life = -1);
     void Open();
+    void Close();
 		Relay(
         std::optional<np*> _net,
 				unsigned short int r_port,
