@@ -21,7 +21,7 @@ int main(void) {
 
   /** connect to relay */
   Peer p(std::nullopt, (unsigned short) 1338);
-  p.Connect("68.84.7.154:1337");
+  p.Connect("127.0.0.1:1337");
   p.Raw_Write("hello!", 3000);
   std::this_thread::sleep_for(std::chrono::milliseconds(20)); // Too fast for its own good :)
   p.Close();
