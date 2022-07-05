@@ -12,7 +12,7 @@ void Peer::Port(unsigned int p) {
 }
 
 /** == raw r/w (these should not be called) == */
-std::string Peer::Raw_Read(unsigned int t) {
+std::string Peer::RawRead(unsigned int t) {
   if (t < 1) {t = this->tout;}
 
   Timeout to(t, this->net->socketfd());
@@ -21,7 +21,30 @@ std::string Peer::Raw_Read(unsigned int t) {
   return m;
 }
 
-void Peer::Raw_Write(std::string m, unsigned int t) {
+std::string Peer::AwaitRawRead(unsigned int l) {
+  int life = l;
+  if (l < 1) {life = -1;}
+  try {
+    while(!this->Flags.GetFlag(Peer::CLOSE)) {
+      struct pollfd pfds[1];
+      pfds[0].fd = this->net->socketfd();
+      pfds[0].events = POLLIN;
+      poll(pfds, 1, life);
+      if (pfds[0].revents == POLLIN) {
+        return this->RawRead();
+      } else {
+        break;
+      }
+      continue;
+    }
+    throw;
+  } catch (...) {
+    // TODO destroy poll event
+    return "";
+  }
+}
+
+void Peer::RawWrite(std::string m, unsigned int t) {
   if (t < 1) {t = this->tout;}
 
   Timeout to(t, this->net->socketfd());
@@ -33,13 +56,17 @@ void Peer::Raw_Write(std::string m, unsigned int t) {
 std::string Peer::Read(unsigned int t) {
   if (t < 1) {t = this->tout;}
   
-  return this->sec.AD(this->Raw_Read(t));
+  return this->sec.AD(this->RawRead(t));
+}
+
+std::string Peer::AwaitRead(unsigned int l) {
+  return this->sec.AD(this->AwaitRawRead(l));
 }
 
 void Peer::Write(std::string m, unsigned int t) {
   if (t < 1) {t = this->tout;}
 
-  this->Raw_Write(this->sec.AE(m), t);
+  this->RawWrite(this->sec.AE(m), t);
 }
 
 void Peer::Close() {
@@ -60,8 +87,9 @@ void Peer::Connect(std::string ip, unsigned short int port) {
 Peer::Peer(
   std::optional<np*> _net,
   unsigned int timeout
-) : Flags(UFTEMP::Peer), tout(timeout) {
-  Flags.SetFlag(Peer::CLOSE, false);
+) : tout(timeout) {
+  Flags.Reserve(0, 4);
+  Flags.SetFlag(Peer::HOST, false);
   if (!_net.has_value()) {
     std::cout << "[%] No Protocol Passed, assuming CSP\n"; // DEBUG
     /** csp */

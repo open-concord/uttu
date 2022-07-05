@@ -13,3 +13,7 @@ s:
 # protocol
 p:
 	$(GCC) $(INC) prot.cpp -o bin/p.out $(LINK)
+
+# flag
+f:
+	$(GCC) $(INC) flag.cpp -o bin/f.out $(LINK)

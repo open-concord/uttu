@@ -43,21 +43,15 @@ protected:
   std::vector<std::vector<bool>> ftape;
 public:
   unsigned int FlagCount(unsigned int);
+  void Reserve(unsigned int, unsigned int);
   void SetFlag(unsigned int, bool, unsigned int = 0);
   bool GetFlag(unsigned int, unsigned int = 0);
   FlagManager(unsigned int); // count of tapes only
   FlagManager(FlagManager::PRETAPE); // solo
   FlagManager(std::vector<FlagManager::PRETAPE>); // blanket 
   FlagManager(std::vector<FlagManager::TAPE>); // literal 
+  FlagManager();
 };
-
-#ifndef UFTEMPH
-#define UFTEMPH
-namespace UFTEMP {
-  inline FlagManager::PRETAPE Peer {4, false};
-  inline FlagManager::PRETAPE Relay {3, false}; 
-};
-#endif
 
 struct Peer {
 public:
@@ -73,13 +67,15 @@ public:
     np* net;
     unsigned int tout; 
 		/** Raw operations */
-		std::string Raw_Read(unsigned int t = 0);
-		void Raw_Write(std::string m, unsigned int t = 0);
+		std::string RawRead(unsigned int t = 0);
+    std::string AwaitRawRead(unsigned int l = 0);
+    void RawWrite(std::string m, unsigned int t = 0);
     void Port(unsigned int);
     /** getters */
     bool Host(); // get
 		/** operations */
 		std::string Read(unsigned int t = 0);
+    std::string AwaitRead(unsigned int l = 0);
 		void Write(std::string m, unsigned int t = 0);
 		/** state */
 		void Close(); // close current socket
