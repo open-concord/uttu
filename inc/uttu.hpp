@@ -34,22 +34,17 @@
 #include "protocols.hpp"
 
 struct FlagManager {
-public:
-  /** QoL */
-  using PRETAPE = std::pair<unsigned int, bool>;
-  using TAPE = std::vector<bool>;
 /** flags */
 protected:
   std::vector<std::vector<bool>> ftape;
 public:
-  unsigned int FlagCount(unsigned int);
   void Reserve(unsigned int, unsigned int);
-  void SetFlag(unsigned int, bool, unsigned int = 0);
-  bool GetFlag(unsigned int, unsigned int = 0);
-  FlagManager(unsigned int); // count of tapes only
-  FlagManager(FlagManager::PRETAPE); // solo
-  FlagManager(std::vector<FlagManager::PRETAPE>); // blanket 
-  FlagManager(std::vector<FlagManager::TAPE>); // literal 
+  void Fill(bool, unsigned int = 0);
+  unsigned int FlagCount(unsigned int);
+  void Set(unsigned int, bool, unsigned int = 0);
+  bool Get(unsigned int, unsigned int = 0);
+  FlagManager(unsigned int); // count of tapes only 
+  FlagManager(std::vector<std::vector<bool>>); // literal 
   FlagManager();
 };
 

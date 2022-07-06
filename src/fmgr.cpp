@@ -7,11 +7,21 @@ void FlagManager::Reserve(unsigned int tape, unsigned int count) {
   this->ftape.at(tape).resize(count);
 }
 
+void FlagManager::Fill(bool state, unsigned int tindex) {
+  try {
+    for (unsigned int i=0; i<this->ftape.at(tindex).size(); i++) {
+      this->ftape.at(tindex).at(i) = state;
+    }
+  } catch (std::exception& e) {
+    std::cout << "[!!] " << e.what() << '\n';
+  }
+}
+
 unsigned int FlagManager::FlagCount(unsigned int tindex) {
   return this->ftape.at(tindex).size(); 
 }
 
-void FlagManager::SetFlag( 
+void FlagManager::Set( 
     unsigned int index, 
     bool state, 
     unsigned int tindex 
@@ -28,14 +38,12 @@ void FlagManager::SetFlag(
       flags.resize(index+1);
     }
     flags.at(index) = state;
-  } catch(const char* cem) {
-    std::cout << "[!] " << cem << '\n';
   } catch(std::exception& e) {
     std::cout << "[!!] " << e.what() << '\n';
   }
 }
 
-bool FlagManager::GetFlag(
+bool FlagManager::Get(
     unsigned int index,
     unsigned int tindex
   ) {
@@ -52,33 +60,11 @@ FlagManager::FlagManager(unsigned int tcount) {
   this->ftape.resize(tcount);
 }
 
+FlagManager::FlagManager(std::vector<std::vector<bool>> temp) {
+  this->ftape.resize(temp.size());
+  for (unsigned int i=0; i<temp.size(); i++) {
+    this->ftape.at(i) = temp.at(i);
+  }
+}
+
 FlagManager::FlagManager() {}
-
-FlagManager::FlagManager(PRETAPE ftemp) {
-  auto fcount = std::get<0>(ftemp);
-  auto state = std::get<1>(ftemp);
-  this->ftape.resize(1);
-  this->ftape.at(0).resize(fcount);
-  for (unsigned int j=0; j<fcount; j++) {
-    this->ftape.at(0).at(j) = state;
-  }
-}
-
-FlagManager::FlagManager(std::vector<PRETAPE> fttemp) {
-  this->ftape.resize(fttemp.size());
-  for (unsigned int i=0; i<fttemp.size(); i++) {
-    auto fcount = std::get<0>(fttemp.at(i));
-    auto state = std::get<1>(fttemp.at(i));
-    this->ftape.at(i).resize(fcount);
-    for (unsigned int j=0; j<fcount; j++) {
-      this->ftape.at(i).at(j) = state;
-    }
-  } 
-}
-
-FlagManager::FlagManager(std::vector<TAPE> fttemp) {
-  this->ftape.resize(1);
-  for (unsigned int i=0; i<fttemp.size(); i++) {
-    this->ftape.at(i) = fttemp.at(i);
-  }
-}

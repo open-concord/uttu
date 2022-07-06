@@ -4,7 +4,7 @@
 /** == status == */
 
 bool Peer::Host() {
-  return this->Flags.GetFlag(Peer::HOST);
+  return this->Flags.Get(Peer::HOST);
 }
 
 void Peer::Port(unsigned int p) {
@@ -25,7 +25,7 @@ std::string Peer::AwaitRawRead(unsigned int l) {
   int life = l;
   if (l < 1) {life = -1;}
   try {
-    while(!this->Flags.GetFlag(Peer::CLOSE)) {
+    while(!this->Flags.Get(Peer::CLOSE)) {
       struct pollfd pfds[1];
       pfds[0].fd = this->net->socketfd();
       pfds[0].events = POLLIN;
@@ -89,7 +89,7 @@ Peer::Peer(
   unsigned int timeout
 ) : tout(timeout) {
   Flags.Reserve(0, 4);
-  Flags.SetFlag(Peer::HOST, false);
+  Flags.Fill(false);
   if (!_net.has_value()) {
     std::cout << "[%] No Protocol Passed, assuming CSP\n"; // DEBUG
     /** csp */

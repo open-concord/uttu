@@ -3,7 +3,7 @@
 
 void Relay::_Lazy(unsigned int life) {
   try {
-    while(!Flags.GetFlag(Relay::CLOSE, 1)) {
+    while(!Flags.Get(Relay::CLOSE, 1)) {
       struct pollfd pfds[1];
       pfds[0].fd = this->net->socketfd();
       pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
@@ -15,8 +15,11 @@ void Relay::_Lazy(unsigned int life) {
       }
       continue;
     }
-    throw;
-  } catch (...) {
+    throw "";
+  } catch(const char* m) {
+    std::cout << "[%] Stopping Lazy Accept\n";
+  } catch (std::exception& e) {
+    std::cout << "[!!] " << e.what() << '\n';
     /** destroy poll event please ~u*/
     return;
   }
@@ -31,42 +34,42 @@ void Relay::Criteria(std::function<bool(std::string)> c) {
 }
 
 void Relay::Lazy(bool blocking, unsigned int life) {
-  if (Flags.GetFlag(Relay::LAZY, 1)) {return;}
+  if (Flags.Get(Relay::LAZY, 1)) {return;}
   if (blocking) {
     this->_Lazy(life);
   } else {
     std::jthread lt(&Relay::_Lazy, this, life);
     lt.detach();
   }
-  Flags.SetFlag(Relay::LAZY, true, 1);
+  Flags.Set(Relay::LAZY, true, 1);
 }
 
 void Relay::Foward() {	
 	int t = 3000;
   /** create peer */
   Peer p(new csp, t); 
-  p.Flags.SetFlag(Peer::UNTRUSTED, true);
+  p.Flags.Set(Peer::UNTRUSTED, true);
   /** pull peer's connection from own queue */
   p.net->queue(this->net->socketfd());
  
 	if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
-		p.Flags.SetFlag(Peer::UNTRUSTED, false);
-    this->_e(std::move(p));
+		p.Flags.Set(Peer::UNTRUSTED, false);
+    this->_e(p);
 	}
 }
 
 void Relay::Open() {
-  if (Flags.GetFlag(1, Relay::OPEN)) {return;}
+  if (Flags.Get(1, Relay::OPEN)) {return;}
   try {
     listen(this->net->socketfd(), this->queueL);
-    Flags.SetFlag(1, Relay::OPEN, true);
+    Flags.Set(1, Relay::OPEN, true);
   } catch (std::exception& e) {
     std::cout << "[!] " << e.what() << '\n';
   }
 }
 
 void Relay::Close() {
-  this->Flags.SetFlag(Relay::CLOSE, true, 1);
+  this->Flags.Set(Relay::CLOSE, true, 1);
   this->net->closeb();
 }
 
@@ -78,6 +81,8 @@ Relay::Relay(
 ) : Peer(_net, timeout), queueL(_queueL) {  
   this->Port(r_port);
   this->Flags.Reserve(0, 4);
+  this->Flags.Fill(false);
   this->Flags.Reserve(1, 3);
-  this->Flags.SetFlag(Peer::HOST, true); 
+  this->Flags.Fill(false, 1);
+  this->Flags.Set(Peer::HOST, true); 
 }
