@@ -29,6 +29,7 @@ public:
   void Keys(); // generate key pair
   void Gen(); 
   /** setters/getters */
+  bool Zero(std::string); // check if SecByteBlock is zero'd
   void Peer(std::string p); // set ppub
   std::string Public(); // pull pub key
   std::string Shared(); // get shared secret

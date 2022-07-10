@@ -40,8 +40,15 @@ void dhms::Keys() {
 void dhms::Gen() {
   if (!this->ecd.Agree(this->shared, this->pri, this->ppub)) {
     // ERROR
-    std::cout << "Could not agree on shared secret\n";
+    std::cout << "[!] Could not agree on shared secret\n";
   }
+}
+
+bool dhms::Zero(std::string k) {
+  for (unsigned int i=0; i < k.length()-1; i++) {
+    if (k[i] != '0') {return false;}
+  }
+  return true;
 }
 
 void dhms::Peer(std::string p) {

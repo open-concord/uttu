@@ -2,7 +2,7 @@
 
 int main () {
   dhms d, p;
-
+  
   d.Peer(p.Public());
   p.Peer(d.Public());
   d.Gen();
