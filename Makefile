@@ -12,7 +12,7 @@ OBJ =	$(BIN)uttu.o \
 			$(BIN)timeout.o \
 			$(BIN)peer.o \
 			$(BIN)relay.o \
-			$(BIN)sec.o \
+			$(BIN)dhm.o \
 			$(BIN)fmgr.o \
 			$(BIN)csp.o
 # ^ will find better solution later
@@ -43,8 +43,8 @@ $(BIN)peer.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/peer.cpp -o $@
 $(BIN)relay.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/relay.cpp -o $@
-$(BIN)sec.o: inc/uttu.hpp
-	$(CC) $(CFLAGS) src/sec.cpp -o $@
+$(BIN)dhm.o: inc/uttu.hpp
+	$(CC) $(CFLAGS) src/dhm.cpp -o $@
 $(BIN)timeout.o: inc/uttu.hpp
 	$(CC) $(CFLAGS) src/timeout.cpp -o $@
 $(BIN)uttu.o: inc/uttu.hpp

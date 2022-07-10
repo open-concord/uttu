@@ -21,18 +21,18 @@ private:
   SecByteBlock pub; // own public
   SecByteBlock ppub; // peer public
   SecByteBlock shared; // both shared
-  // key utility (interfaced via hex)
-  SecByteBlock _Set(std::string k); // used to set keys
-  std::string _Get(SecByteBlock* k); // used to get keys
+  /** key utility (interfaced via hex) */
+  SecByteBlock _Set(std::string k);
+  std::string _Get(SecByteBlock* k);
 public:
-  // generators
-  dhms();
+  /** generators */
   void Keys(); // generate key pair
-  void Gen(); // this may take a bit if ur a potato
-  // setters/getters
+  void Gen(); 
+  /** setters/getters */
   void Peer(std::string p); // set ppub
   std::string Public(); // pull pub key
   std::string Shared(); // get shared secret
   std::string AE(std::string in); // Authenticated Encryption
   std::string AD(std::string in); // Authenticated Decryption
+  dhms();
 };

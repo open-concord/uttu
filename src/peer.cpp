@@ -83,7 +83,6 @@ void Peer::Connect(std::string ip, unsigned short int port) {
   th.Cancel();
 }
 
-/** WIP: Make Peer bootstrappable */
 Peer::Peer(
   std::optional<np*> _net,
   unsigned int timeout

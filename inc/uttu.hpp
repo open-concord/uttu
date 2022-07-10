@@ -14,9 +14,6 @@
 #include <netdb.h> // gethostbyname
 #include <poll.h> // ppoll & poll
 #endif
-#ifdef _WIN64 // windows 64
-#include <ws2def.h>
-#endif
 
 /** standard libs */
 #include <vector>
@@ -94,11 +91,11 @@ struct Relay : public Peer {
 		unsigned short queueL;	
 
 		std::function<bool(std::string)> _c = nullptr; // criteria
-    std::function<void(Peer)> _e = nullptr; // embedded logic (for Peer foward) (assumes responsibility for Peer)
+    std::function<void(std::shared_ptr<Peer>)> _e = nullptr; // embedded logic (for Peer foward) (assumes responsibility for Peer)
 		void _Lazy(unsigned int life);
     void Foward();
 	public:
-    void Embed(std::function<void(Peer)> p);
+    void Embed(std::function<void(std::shared_ptr<Peer>)> p);
 	  void Criteria(std::function<bool(std::string)> c);
 		void Lazy(bool blocking, unsigned int life = -1);
     void Open();

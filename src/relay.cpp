@@ -25,7 +25,7 @@ void Relay::_Lazy(unsigned int life) {
   }
 }
 
-void Relay::Embed(std::function<void(Peer)> e) {
+void Relay::Embed(std::function<void(std::shared_ptr<Peer>)> e) {
   this->_e = e;
 }
 
@@ -51,10 +51,10 @@ void Relay::Foward() {
   p.Flags.Set(Peer::UNTRUSTED, true);
   /** pull peer's connection from own queue */
   p.net->queue(this->net->socketfd());
- 
+
 	if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
 		p.Flags.Set(Peer::UNTRUSTED, false);
-    this->_e(p);
+    this->_e(std::make_shared<Peer>(p));
 	}
 }
 
