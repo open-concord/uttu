@@ -93,6 +93,6 @@ Peer::Peer(
     std::cout << "[%] No Protocol Passed, assuming CSP\n"; // DEBUG
     /** csp */
     this->net = new csp;
-  } else {this->net = _net.value();} 
+  } else {this->net = _net.value();}
 }
 
