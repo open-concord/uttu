@@ -25,7 +25,7 @@ void Relay::_Lazy(unsigned int life) {
   }
 }
 
-void Relay::Embed(std::function<void(std::shared_ptr<Peer>)> e) {
+void Relay::Embed(std::function<void(std::unique_ptr<Peer>)> e) {
   this->_e = e;
 }
 
@@ -54,7 +54,7 @@ void Relay::Foward() {
 
 	if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
 		p.Flags.Set(Peer::UNTRUSTED, false);
-    this->_e(std::make_shared<Peer>(p));
+    this->_e(std::make_unique<Peer>(p));
 	}
 }
 
