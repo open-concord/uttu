@@ -3,10 +3,10 @@
 using namespace CryptoPP;
 
 dhms::dhms() : ecd(ECDH<ECP>::Domain(ASN1::secp256r1()/** NIST compliant 256 bit curve */)),
-    pri(this->ecd.PrivateKeyLength()),
-    pub(this->ecd.PublicKeyLength()),
-    ppub(this->ecd.PublicKeyLength()),
-    shared(this->ecd.AgreedValueLength())
+    pri(NULL, this->ecd.PrivateKeyLength()),
+    pub(NULL, this->ecd.PublicKeyLength()),
+    ppub(NULL, this->ecd.PublicKeyLength()),
+    shared(NULL, this->ecd.AgreedValueLength())
 {
   this->Keys(); // gen new keys
 }
