@@ -60,7 +60,7 @@ void Relay::Foward() {
 }
 
 void Relay::Open() {
-  if (Flags.Get(1, Relay::OPEN)) {return;}
+  if (Flags.Get(Relay::OPEN, 1)) {return;}
   try {
     listen(this->net->socketfd(), this->queueL);
     Flags.Set(Relay::OPEN, true, 1);
