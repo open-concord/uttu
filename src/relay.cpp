@@ -48,14 +48,12 @@ void Relay::Foward() {
 	int t = 3000;
   /** create peer */
   Peer p(new csp, t);   
+  p.Flags.Set(Peer::UNTRUSTED, true);
+  p.Flags.Set(Peer::HOST, true);
   /** pull peer's connection from own queue */
   p.net->queue(this->net->socketfd());
-  p.Flags.Set(Peer::UNTRUSTED, true);
-  std::cout << p.Flags.Get(Peer::UNTRUSTED) << '\n'; // DEBUG
+
   if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
-		p.Flags.Set(Peer::UNTRUSTED, false);
-    p.Flags.Set(Peer::HOST, true);
-    std::cout << p.Flags.Get(Peer::HOST) << '\n'; // DEBUG
     this->_e(std::make_unique<Peer>(p));
 	}
 }
