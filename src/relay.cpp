@@ -35,13 +35,13 @@ void Relay::Criteria(std::function<bool(std::string)> c) {
 
 void Relay::Lazy(bool blocking, unsigned int life) {
   if (Flags.Get(Relay::LAZY, 1)) {return;}
+  Flags.Set(Relay::LAZY, true, 1);
   if (blocking) {
     this->_Lazy(life);
   } else {
     std::jthread lt(&Relay::_Lazy, this, life);
     lt.detach();
   }
-  Flags.Set(Relay::LAZY, true, 1);
 }
 
 void Relay::Foward() {	
