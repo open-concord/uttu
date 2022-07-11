@@ -49,6 +49,7 @@ void Relay::Foward() {
   /** create peer */
   Peer p(new csp, t); 
   p.Flags.Set(Peer::UNTRUSTED, true);
+  p.Flags.Set(Peer::HOST, true);
   /** pull peer's connection from own queue */
   p.net->queue(this->net->socketfd());
 

@@ -52,8 +52,7 @@ bool FlagManager::Get(
     return flags.at(index);
   } catch(std::exception& e) {
     std::cout << "[!!] " << e.what() << '\n';
-  }
-  return false; /** this is misleading */
+  } 
 }
 
 FlagManager::FlagManager(unsigned int tcount) {
