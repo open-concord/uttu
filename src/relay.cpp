@@ -63,7 +63,7 @@ void Relay::Open() {
   if (Flags.Get(1, Relay::OPEN)) {return;}
   try {
     listen(this->net->socketfd(), this->queueL);
-    Flags.Set(1, Relay::OPEN, true);
+    Flags.Set(Relay::OPEN, true, 1);
   } catch (std::exception& e) {
     std::cout << "[!] " << e.what() << '\n';
   }
