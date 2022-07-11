@@ -54,6 +54,7 @@ void Relay::Foward() {
   p.net->queue(this->net->socketfd());
 
   if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
+    p.Flags.Set(Peer::UNTRUSTED, false);
     this->_e(std::make_unique<Peer>(p));
 	}
 }
