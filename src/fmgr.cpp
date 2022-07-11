@@ -40,7 +40,7 @@ void FlagManager::Set(
     flags.at(index) = state;
   } catch(std::exception& e) {
     std::cout << "[!!] " << e.what() << '\n';
-  }
+ }
 }
 
 bool FlagManager::Get(
