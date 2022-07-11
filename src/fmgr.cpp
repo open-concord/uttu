@@ -32,12 +32,11 @@ void FlagManager::Set(
       this->ftape.resize(this->ftape.size()+1);
       this->ftape.at(tindex).resize(index);
     }
-    auto flags = this->ftape.at(tindex);
-    if (flags.size() <= index) {
+    if (this->ftape.at(tindex).size() <= index) {
       std::cout << "[Warn] Out of Bounds Set\n";
-      flags.resize(index+1);
+      this->ftape.at(tindex).resize(index+1);
     }
-    flags.at(index) = state;
+    this->ftape.at(tindex).at(index) = state;
   } catch(std::exception& e) {
     std::cout << "[!!] " << e.what() << '\n';
  }
@@ -47,9 +46,8 @@ bool FlagManager::Get(
     unsigned int index,
     unsigned int tindex
   ) {
-  auto flags = this->ftape.at(tindex);
   try {
-    return flags.at(index);
+    return this->ftape.at(tindex).at(index);
   } catch(std::exception& e) {
     std::cout << "[!!] " << e.what() << '\n';
   } 
