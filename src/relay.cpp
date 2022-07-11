@@ -3,7 +3,7 @@
 
 void Relay::_Lazy(unsigned int life) {
   try {
-    while(!Flags.Get(Relay::CLOSE, 1)) {
+    while(!Flags.Get(Relay::CLOSE, 1) || Flags.Get(Relay::LAZY, 1)) {
       struct pollfd pfds[1];
       pfds[0].fd = this->net->socketfd();
       pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
