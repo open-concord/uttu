@@ -8,16 +8,20 @@ void Relay::_Lazy(unsigned int life) {
       pfds[0].fd = this->net->socketfd();
       pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
       poll(pfds, 1, life);
-      if (pfds[0].revents == POLLIN) {
+      if (pfds[0].revents == POLLIN || pfds[0].revents == POLLHUP) {
         this->Foward();
       } else {
-        break;
+        throw pfds[0].revents;
       }
       continue;
     }
-    throw "";
-  } catch(const char* m) {
-    std::cout << "[%] Stopping Lazy Accept\n";
+    throw 0;
+  } catch(int i) {
+    if (i < 1) {
+      std::cout << "[%] Stopping Lazy Accept\n";
+    } else { 
+      std::cout << "[%] Closed Due To | " << i << '\n';
+    }
   } catch (std::exception& e) {
     std::cout << "[!!] " << e.what() << '\n';
     /** destroy poll event please ~u*/
