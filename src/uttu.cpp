@@ -7,9 +7,10 @@ void Kill_Socket(int s) {
   // don't do stuff here
   int e = close(s);
   if (e < 0) {
-    if (e == 9) {return;} // already closed
-    else if (e == 77) {
-      errc("[!!] EBADFD, could not close socket");
+    int c = errno;
+    if (c == 9) {return;} // already closed
+    else {
+      errc("[!!] ErrNo "+c);
     }
   }
 }
