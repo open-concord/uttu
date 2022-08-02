@@ -17,3 +17,7 @@ p:
 # flag
 f:
 	$(GCC) $(INC) flag.cpp -o bin/f.out $(LINK)
+
+# timeout
+t:
+	$(GCC) $(INC) tout.cpp -o bin/t.out $(LINK)

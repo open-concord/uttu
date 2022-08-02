@@ -1,25 +1,39 @@
 #include "../inc/uttu.hpp"
 
 // private
-void Timeout::_async(int t) {
+void Timeout::_async(int t) { 
   std::this_thread::sleep_for(std::chrono::milliseconds(t));
   try {
     if (this->_cancel) {
-      throw;
+      return; 
     } else {
       Kill_Socket(this->sk);
+      return;
     }
-  } catch (...) {
-    /** either Timeout no longer exists and or is cancelled */
-    return;
+  } catch (std::exception &e) { // uh oh
+    errc(e.what());
   }
 }
 
 // public
 Timeout::Timeout(unsigned int t, int s) {
   this->sk = s;
+  this->tout = t;
   this->expire = std::jthread(&Timeout::_async, this, t);
   this->expire.detach();
+}
+
+void Timeout::Suspend(
+    std::atomic<bool>& reanimate
+  ) {
+  this->_cancel = true;
+  auto await = std::jthread([&]{ 
+    reanimate.wait(false);
+    this->_cancel = false;
+    this->expire = std::jthread(&Timeout::_async, this, this->tout);
+    this->expire.detach();
+  });
+  await.detach();
 }
 
 void Timeout::Cancel() {

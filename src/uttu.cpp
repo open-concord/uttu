@@ -3,10 +3,14 @@
 /** ==non-member functions== */
 void Kill_Socket(int s) {
   // do stuff here
-  printf("%s\n", "Killing Socket");
+  printf("%s\n", "[%] Killing Socket");
   // don't do stuff here
-  if (shutdown(s, 2) < 0) {
-    errc("COULD NOT CLOSE TIMED OUT SOCKET");
+  int e = close(s);
+  if (e < 0) {
+    if (e == 9) {return;} // already closed
+    else if (e == 77) {
+      errc("[!!] EBADFD, could not close socket");
+    }
   }
 }
 

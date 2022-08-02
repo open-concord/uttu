@@ -115,4 +115,4 @@ void csp::writeb(std::string m) {
 }
 
 /** close (no status) */
-void csp::closeb() {close(this->sockfd);}
+void csp::closeb() {shutdown(this->sockfd, 2);}
