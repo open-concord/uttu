@@ -5,30 +5,28 @@
 #include <stdexcept>
 
 void Relay::_Lazy(unsigned int life) {
-  try {
-    while(!Flags.Get(Relay::CLOSE, 1) || Flags.Get(Relay::LAZY, 1)) {
-      struct pollfd pfds[1];
-      pfds[0].fd = this->net->socketfd();
-      pfds[0].events = POLLIN; // man pages poll(2) has the bit mask values
-      poll(pfds, 1, life);
-      if (pfds[0].revents == POLLIN) {
+  while(!Flags.Get(Relay::CLOSE, 1) || Flags.Get(Relay::LAZY, 1)) {
+    struct pollfd pfds[1];
+    pfds[0].fd = this->net->socketfd();
+    pfds[0].events = POLLIN; // man pages poll(2) has the bit mask values
+    poll(pfds, 1, life); 
+    
+    switch(pfds[0].revents) {
+      case POLLRDNORM: // equivalent to POLLIN
+      case POLLIN:
         this->Foward();
-      } else {
-        throw pfds[0].revents;
-      }
-      continue;
+        break;
+      case POLLPRI:
+        break;
+      case POLLRDHUP:
+        break;
+      case POLLERR:
+        break;
+      case POLLNVAL:
+        break;
+      default:
+        continue;
     }
-    throw 0;
-  } catch(short i) {
-    if (i < 1) {
-      std::cout << "[%] Stopping Lazy Accept\n";
-    } else { 
-      std::cout << "[%] Closed Due To | " << i << '\n';
-    }
-  } catch (std::exception& e) {
-    std::cout << "[!!] " << e.what() << '\n';
-    /** destroy poll event please ~u*/
-    return;
   }
 }
 
