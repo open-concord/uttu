@@ -19,6 +19,7 @@ void Relay::_Lazy(unsigned int life) {
         this->Foward();
         break;
       case POLLPRI:
+        debug.bump("- [!!] POLLPRI hit");
         break;
       case POLLRDHUP:
       case POLLHUP:
