@@ -1,4 +1,5 @@
 #include "../inc/timeout.hpp"
+#include "../inc/debug.hpp"
 
 // private
 void Timeout::_async(int t) { 
@@ -12,7 +13,7 @@ void Timeout::_async(int t) {
         return;
     }
   } catch (std::exception &e) { // uh oh
-    // error(e.what());
+    debug.bump("[!] ", e.what());
   }
 }
 

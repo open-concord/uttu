@@ -1,4 +1,5 @@
 #include "../inc/relay.hpp"
+#include "../inc/debug.hpp"
 #include "../proto/csp/inc/csp.hpp"
 #include <iostream>
 #include <thread>
@@ -21,18 +22,24 @@ void Relay::_Lazy(unsigned int life) {
         break;
       case POLLRDHUP:
       case POLLHUP:
-        std::cout << " - [%] POLLHUP hit\n";
-        std::cout << " L [%] Restarting Poll\n";
+        debug.bump("- [%] POLLHUP hit");
         cont = true;
         break;         
       case POLLERR:
+        debug.bump("- [%] Poll Error");
         break;
       case POLLNVAL:
+        debug.bump("- [%] Invalid FD"); 
         break;
       default:
         cont = true;
     }
-    if (cont) continue;
+    if (cont) {
+      debug.bump("L [%] Restarting Poll");
+      continue;
+    } else {
+      debug.bump("L [!] Closing Poll");
+    }
   }
 }
 
@@ -76,7 +83,7 @@ void Relay::Open() {
     listen(this->net->socketfd(), this->queueL);
     Flags.Set(Relay::OPEN, true, 1);
   } catch (std::exception& e) {
-    std::cout << "[!] " << e.what() << '\n';
+    debug.bump("[!] ", e.what());
   }
 }
 

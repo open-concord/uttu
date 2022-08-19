@@ -1,4 +1,5 @@
 #include "../inc/flags.hpp"
+#include "../inc/debug.hpp"
 #include <iostream>
 
 void FlagManager::Reserve(unsigned int tape, unsigned int count) {
@@ -14,7 +15,7 @@ void FlagManager::Fill(bool state, unsigned int tindex) {
       this->ftape.at(tindex).at(i) = state;
     }
   } catch (std::exception& e) {
-    std::cout << "[!!] " << e.what() << '\n';
+    debug.bump("[!!] ", e.what());
   }
 }
 
@@ -29,17 +30,17 @@ void FlagManager::Set(
     ) {
   try {
     if (this->ftape.size() <= tindex) {
-      std::cout << "[%] Starting new tape @ index " << tindex << '\n';
+      debug.bump("[%] Starting new tape @ index ", tindex);
       this->ftape.resize(this->ftape.size()+1);
       this->ftape.at(tindex).resize(index);
     }
     if (this->ftape.at(tindex).size() <= index) {
-      std::cout << "[Warn] Out of Bounds Set\n";
+      debug.bump("[Warn] Out of Bounds Set");
       this->ftape.at(tindex).resize(index+1);
     }
     this->ftape.at(tindex).at(index) = state;
   } catch(std::exception& e) {
-    std::cout << "[!!] " << e.what() << '\n';
+    debug.bump("[!!] ", e.what());
  }
 }
 
@@ -50,7 +51,7 @@ bool FlagManager::Get(
   try {
     return this->ftape.at(tindex).at(index);
   } catch(std::exception& e) {
-    std::cout << "[!!] " << e.what() << '\n';
+    debug.bump("[!!] ", e.what());
   } 
 }
 

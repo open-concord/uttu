@@ -1,6 +1,7 @@
 #include "../inc/peer.hpp"
 #include "../inc/timeout.hpp"
 #include "../proto/csp/inc/csp.hpp"
+#include "../inc/debug.hpp"
 
 #include <iostream>
 
@@ -93,7 +94,7 @@ Peer::Peer(
   Flags.Reserve(0, 4);
   Flags.Fill(false);
   if (!_net.has_value()) {
-    std::cout << "[%] No Protocol Passed, assuming CSP\n"; // DEBUG
+    debug.bump("[%] No Protocol Passed, assuming CSP");
     /** csp */
     this->net = new csp;
   } else {this->net = _net.value();}

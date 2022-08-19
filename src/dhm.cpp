@@ -1,4 +1,5 @@
 #include "../inc/dhm.hpp"
+#include "../inc/debug.hpp"
 
 #include <iostream>
 
@@ -42,7 +43,7 @@ void dhms::Keys() {
 void dhms::Gen() {
   if (!this->ecd.Agree(this->shared, this->pri, this->ppub)) {
     // ERROR
-    std::cout << "[!] Could not agree on shared secret\n";
+    debug.bump("[!] Could not agree on shared secret");
   }
 }
 
