@@ -9,7 +9,7 @@ void Relay::_Lazy(unsigned int life) {
     while(!Flags.Get(Relay::CLOSE, 1) || Flags.Get(Relay::LAZY, 1)) {
       struct pollfd pfds[1];
       pfds[0].fd = this->net->socketfd();
-      pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
+      pfds[0].events = POLLIN; // man pages poll(2) has the bit mask values
       poll(pfds, 1, life);
       if (pfds[0].revents == POLLIN) {
         this->Foward();
@@ -19,7 +19,7 @@ void Relay::_Lazy(unsigned int life) {
       continue;
     }
     throw 0;
-  } catch(int i) {
+  } catch(short i) {
     if (i < 1) {
       std::cout << "[%] Stopping Lazy Accept\n";
     } else { 
