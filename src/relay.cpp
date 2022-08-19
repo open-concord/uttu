@@ -44,7 +44,7 @@ void Relay::_Lazy(unsigned int life) {
   }
 }
 
-void Relay::Embed(std::function<void(std::unique_ptr<Peer>)> e) {
+void Relay::Embed(std::function<void(Peer&&)> e) {
   this->_e = e;
 }
 
@@ -66,14 +66,14 @@ void Relay::Lazy(bool blocking, unsigned int life) {
 void Relay::Foward() {	
 	int t = 3000;
   /** create peer */
-  std::unique_ptr<Peer> p = std::make_unique<Peer>(new csp, t);
-  p.get()->Flags.Set(Peer::UNTRUSTED, true);
-  p.get()->Flags.Set(Peer::HOST, true);
+  Peer&& p = Peer(new csp, t);
+  p.Flags.Set(Peer::UNTRUSTED, true);
+  p.Flags.Set(Peer::HOST, true);
   /** pull peer's connection from own queue */
-  p.get()->net->queue(this->net->socketfd());
+  p.net->queue(this->net->socketfd());
 
-  if (this->_c == nullptr || this->_c(p.get()->net->peer_ip())) {
-    p.get()->Flags.Set(Peer::UNTRUSTED, false);
+  if (this->_c == nullptr || this->_c(p.net->peer_ip())) {
+    p.Flags.Set(Peer::UNTRUSTED, false);
     this->_e(std::move(p));
 	}
 }

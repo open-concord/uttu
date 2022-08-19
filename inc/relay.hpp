@@ -17,11 +17,11 @@ struct Relay : public Peer {
     /** config */
 		unsigned short queueL;	
 		std::function<bool(std::string)> _c = nullptr; // criteria
-    std::function<void(std::unique_ptr<Peer>)> _e = nullptr; // embedded logic (for Peer foward) (assumes responsibility for Peer)
+    std::function<void(Peer&&)> _e = nullptr; // embedded logic (for Peer foward) (assumes responsibility for Peer)
 		void _Lazy(unsigned int life);
     void Foward();
 	public:
-    void Embed(std::function<void(std::unique_ptr<Peer>)> p);
+    void Embed(std::function<void(Peer&&)> p);
 	  void Criteria(std::function<bool(std::string)> c);
 		void Lazy(bool blocking, unsigned int life = -1);
     void Open();
