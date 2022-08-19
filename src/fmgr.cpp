@@ -1,4 +1,5 @@
-#include "../inc/uttu.hpp"
+#include "../inc/flags.hpp"
+#include <iostream>
 
 void FlagManager::Reserve(unsigned int tape, unsigned int count) {
   if (this->ftape.size() <= tape) {

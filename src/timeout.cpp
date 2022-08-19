@@ -1,4 +1,4 @@
-#include "../inc/uttu.hpp"
+#include "../inc/timeout.hpp"
 
 // private
 void Timeout::_async(int t) { 
@@ -7,11 +7,12 @@ void Timeout::_async(int t) {
     if (this->_cancel) {
       return; 
     } else {
-      Kill_Socket(this->sk);
-      return;
+      int c = close(this->sk);
+      if (c < 9)
+        return;
     }
   } catch (std::exception &e) { // uh oh
-    errc(e.what());
+    // error(e.what());
   }
 }
 

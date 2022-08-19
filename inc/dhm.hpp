@@ -1,5 +1,4 @@
 #pragma once
-#include "uttu.hpp"
 
 #include <cryptopp/eccrypto.h>
 #include <cryptopp/secblock.h>
@@ -9,6 +8,8 @@
 #include <cryptopp/rijndael.h> // AES
 #include <cryptopp/gcm.h>  // GCM
 #include <cryptopp/hex.h> // HexEncoder/Decoder
+
+#include <string>
 
 using namespace CryptoPP;
 

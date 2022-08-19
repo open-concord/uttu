@@ -1,11 +1,13 @@
 #include "../inc/csp.hpp"
+#include <stdexcept>
+#include <cstring>
 
 struct sockaddr_in csp::_form(int port) {
   struct sockaddr_in _peer;
 
   int _peerfd = socket(this->cfamily, SOCK_STREAM, 0);
   if (_peerfd < 0) {
-    errc("[CSP::FORM] COULD NOT CREATE SOCKET");
+    throw std::logic_error("[CSP::FORM] COULD NOT CREATE SOCKET");
   }
 
   bzero((char*) &_peer, sizeof(_peer));
@@ -22,7 +24,7 @@ void csp::target(_tf target) {
 
   s = gethostbyname(target.addr.c_str());
   if (s == NULL) {
-    errc("[CSP::TARGET] COULD NOT FIND PEER's ADDR");
+    throw std::logic_error("[CSP::TARGET] COULD NOT FIND PEER's ADDR");
   }
   struct sockaddr_in _peer = this->_form(target.port);
 
@@ -37,7 +39,7 @@ void csp::target(_tf target) {
     (struct sockaddr*) &_peer,
     (socklen_t) sizeof(_peer)
   ) < 0) {
-    errc("[CSP::TARGET] COULD NOT CONNECT");
+    throw std::logic_error("[CSP::TARGET] COULD NOT CONNECT");
   };
   /** TODO: store _peer */
   this->self = _peer;
@@ -48,7 +50,7 @@ void csp::queue(int origin_fd) {
   socklen_t _inlen = sizeof(_in);
   int fd = accept(origin_fd, (struct sockaddr *) &_in, &_inlen);
   if (fd < 0) {
-    errc("[CSP::QUEUE] COULD NOT ACCEPT");
+    throw std::logic_error("[CSP::QUEUE] COULD NOT ACCEPT");
   } else {
     this->sockfd = fd;
     this->self = _in;
@@ -59,7 +61,7 @@ void csp::port(unsigned short int port) {
   struct sockaddr_in _info = this->_form(port);
 
   if (bind(this->sockfd, (struct sockaddr* ) &_info, sizeof(_info)) < 0) {
-    errc("[CSP::PORT] COULD NOT BIND");
+    throw std::logic_error("[CSP::PORT] COULD NOT BIND");
   }
 
   /** TODO: store _info */
@@ -80,7 +82,7 @@ std::string csp::readb() {
   char sh[4];
   bzero(sh, 4); // zero out buffer
   if (read(this->sockfd, &sh, 4) < 0) {
-    errc("[CSP::READB] COULD NOT READ SIZE HEADER");
+    throw std::logic_error("[CSP::READB] COULD NOT READ SIZE HEADER");
   }
 
   int s = atoi(sh)+4;
@@ -88,11 +90,11 @@ std::string csp::readb() {
   /** read message */
   bzero(b, s); // zero out buffer
   if (read(this->sockfd, &b, s) < 0) {
-    errc("[CSP::READB] COULD NOT READ CONTENT BUFFER");
+    throw std::logic_error("[CSP::READB] COULD NOT READ CONTENT BUFFER");
   }
 
   if (strlen(b) < 1) {
-    errc("[CSP::READB] ZERO-LENGTH MESSAGE");
+    throw std::logic_error("[CSP::READB] ZERO-LENGTH MESSAGE");
   }
 
   return std::string(b);
@@ -101,7 +103,7 @@ std::string csp::readb() {
 /** write (no status) */
 void csp::writeb(std::string m) {
   if (m.length() < 1) {
-    errc("[NP::WRITEB] ZERO-LENGTH MESSAGE");
+    throw std::logic_error("[NP::WRITEB] ZERO-LENGTH MESSAGE");
   }
   /** 4 dec place size header */
   std::string so = std::to_string(m.size());
@@ -110,7 +112,7 @@ void csp::writeb(std::string m) {
   }
   std::string o = so+m;
   if (write(this->sockfd, o.data(), o.size()) < 0) {
-    errc("[CSP::WRITEB] COULD NOT WRITE");
+    throw std::logic_error("[CSP::WRITEB] COULD NOT WRITE");
   };
 }
 
