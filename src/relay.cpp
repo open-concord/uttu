@@ -11,7 +11,7 @@ void Relay::_Lazy(unsigned int life) {
       pfds[0].fd = this->net->socketfd();
       pfds[0].events = POLLIN; /** man pages poll(2) has the bit mask values */
       poll(pfds, 1, life);
-      if (pfds[0].revents == POLLIN || pfds[0].revents == POLLHUP) {
+      if (pfds[0].revents == POLLIN) {
         this->Foward();
       } else {
         throw pfds[0].revents;
@@ -26,7 +26,7 @@ void Relay::_Lazy(unsigned int life) {
       std::cout << "[%] Closed Due To | " << i << '\n';
     }
   } catch (std::exception& e) {
-    throw std::logic_error(std::string("[!!] ",e.what()));
+    std::cout << "[!!] " << e.what() << '\n';
     /** destroy poll event please ~u*/
     return;
   }
