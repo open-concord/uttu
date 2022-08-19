@@ -11,6 +11,7 @@ void Relay::_Lazy(unsigned int life) {
     pfds[0].events = POLLIN; // man pages poll(2) has the bit mask values
     poll(pfds, 1, life); 
     
+    bool cont = false;
     switch(pfds[0].revents) {
       case POLLRDNORM: // equivalent to POLLIN
       case POLLIN:
@@ -19,14 +20,19 @@ void Relay::_Lazy(unsigned int life) {
       case POLLPRI:
         break;
       case POLLRDHUP:
-        break;
+      case POLLHUP:
+        std::cout << " - [%] POLLHUP hit\n";
+        std::cout << " L [%] Restarting Poll\n";
+        cont = true;
+        break;         
       case POLLERR:
         break;
       case POLLNVAL:
         break;
       default:
-        continue;
+        cont = true;
     }
+    if (cont) continue;
   }
 }
 
