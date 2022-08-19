@@ -2,6 +2,7 @@
 #include "../proto/csp/inc/csp.hpp"
 #include <iostream>
 #include <thread>
+#include <stdexcept>
 
 void Relay::_Lazy(unsigned int life) {
   try {
@@ -25,7 +26,7 @@ void Relay::_Lazy(unsigned int life) {
       std::cout << "[%] Closed Due To | " << i << '\n';
     }
   } catch (std::exception& e) {
-    std::cout << "[!!] " << e.what() << '\n';
+    throw std::logic_error(std::string("[!!] ",e.what()));
     /** destroy poll event please ~u*/
     return;
   }
