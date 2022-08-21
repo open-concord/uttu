@@ -16,7 +16,7 @@
 /** extendable formatting */
 struct np {
   int sockfd = -1;
-public:
+
   /** origin */ 
   virtual void port(unsigned short int _port) = 0;
   virtual void queue(int origin_fd) = 0;
