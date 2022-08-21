@@ -61,7 +61,8 @@ void Relay::Lazy(bool blocking, unsigned int life) {
 void Relay::Foward() {	
 	int t = 3000;
   /** create peer */
-  Peer&& p = Peer(this->net, t);
+  np& pnp = std::reference_wrapper<np>(net);
+  Peer&& p = Peer(pnp, t);
   p.Flags.Set(Peer::HOST, true);
   
   /** pull peer's connection from own queue */
