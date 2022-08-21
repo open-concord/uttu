@@ -4,20 +4,18 @@
 #include "protocols.hpp"
 
 #include <string>
-#include <optional>
 
 struct Peer {
 public:
     enum {
       HALTED,
       CLOSE,
-      UNTRUSTED,
       HOST
     } FLAGS;
     FlagManager Flags;
 
     dhms sec;
-    np* net;
+    np& net;
     unsigned int tout; 
 		/** Raw operations */
 		std::string RawRead(unsigned int t = 0);
@@ -31,12 +29,11 @@ public:
     std::string AwaitRead(unsigned int l = 0);
 		void Write(std::string m, unsigned int t = 0);
 		/** state */
-		void Close(); // close current socket
-		void Connect(std::string ip, unsigned short int port); // change socket target	
+		void Close(); // close current socket	
 		Peer(
-        std::optional<np*> _net,
-				unsigned int timeout = 3000
-		    );
+      np& _net,
+			unsigned int timeout = 3000
+    );
 };
 
 

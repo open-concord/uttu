@@ -12,8 +12,7 @@ OBJ =	$(BIN)timeout.o \
 			$(BIN)peer.o \
 			$(BIN)relay.o \
 			$(BIN)dhm.o \
-			$(BIN)fmgr.o \
-			$(BIN)csp.o
+			$(BIN)fmgr.o
 
 # target file and install directory
 OFILE = libuttu
@@ -39,18 +38,6 @@ $(BIN)timeout.o: inc/timeout.hpp
 	$(CC) $(CFLAGS) src/timeout.cpp -o $@
 $(BIN)fmgr.o: inc/flags.hpp
 	$(CC) $(CFLAGS) src/fmgr.cpp -o $@
-
-
-# build protocols
-#PDIR = proto
-#protocols:
-#	for p in $(PDIR)/*; do \
-#		cd $$p; $(MAKE); cd ..;	\
-#	done
-
-# == temp ==
-$(BIN)csp.o: proto/csp/inc/csp.hpp
-	$(CC) $(CFLAGS) proto/csp/src/csp.cpp -o $@
 
 clean:
 	rm -f build/bin/*.o

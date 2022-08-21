@@ -1,6 +1,5 @@
 #include "../inc/peer.hpp"
 #include "../inc/timeout.hpp"
-#include "../proto/csp/inc/csp.hpp"
 #include "../inc/debug.hpp"
 
 #include <iostream>
@@ -12,15 +11,15 @@ bool Peer::Host() {
 }
 
 void Peer::Port(unsigned int p) {
-  this->net->port(p);
+  this->net.port(p);
 }
 
 /** == raw r/w (these should not be called) == */
 std::string Peer::RawRead(unsigned int t) {
   if (t < 1) {t = this->tout;}
 
-  Timeout to(t, this->net->socketfd());
-  std::string m = this->net->readb();
+  Timeout to(t, this->net.fd());
+  std::string m = this->net.readb();
   to.Cancel();
   return m;
 }
@@ -31,7 +30,7 @@ std::string Peer::AwaitRawRead(unsigned int l) {
   try {
     while(!this->Flags.Get(Peer::CLOSE)) {
       struct pollfd pfds[1];
-      pfds[0].fd = this->net->socketfd();
+      pfds[0].fd = this->net.fd();
       pfds[0].events = POLLIN;
       poll(pfds, 1, life);
       if (pfds[0].revents == POLLIN) {
@@ -51,8 +50,8 @@ std::string Peer::AwaitRawRead(unsigned int l) {
 void Peer::RawWrite(std::string m, unsigned int t) {
   if (t < 1) {t = this->tout;}
 
-  Timeout to(t, this->net->socketfd());
-  this->net->writeb(m);
+  Timeout to(t, this->net.fd());
+  this->net.writeb(m);
   to.Cancel();
 }
 
@@ -74,29 +73,14 @@ void Peer::Write(std::string m, unsigned int t) {
 }
 
 void Peer::Close() {
-  this->net->closeb();
-}
-
-void Peer::Connect(std::string ip, unsigned short int port) {
-  /** change socket target */
-  Timeout th(this->tout, this->net->socketfd());
-  /** TODO: change based on net protocol */
-  this->net->target(
-    np::_tf {ip, port}
-  );
-  th.Cancel();
+  this->net.closeb();
 }
 
 Peer::Peer(
-  std::optional<np*> _net,
+  np& _net,
   unsigned int timeout
-) : tout(timeout) {
+) : net(_net), tout(timeout) {
   Flags.Reserve(0, 4);
   Flags.Fill(false);
-  if (!_net.has_value()) {
-    debug.bump("[%] No Protocol Passed, assuming CSP");
-    /** csp */
-    this->net = new csp;
-  } else {this->net = _net.value();}
 }
 
