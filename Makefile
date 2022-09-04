@@ -1,4 +1,6 @@
-CC = g++ -c -std=c++20
+default: linux
+G = g++
+CC = $(G) -c -std=c++20
 LINK = -lpthread -lrt -Wall -lcryptopp
 
 # compile-time flags
