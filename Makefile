@@ -1,45 +1,35 @@
 default: linux
+
 G = g++
 CC = $(G) -c -std=c++20
-LINK = -lpthread -lrt -Wall -lcryptopp
+W = -Wall
+LINK = -lpthread -lrt -lcryptopp
 
 # compile-time flags
-CFLAGS = -c -g -Wall -fPIC
+CF = -c -g -MMD -MP $W -fPIC
 
 # listing build targets
 BIN = build/bin/
 
-# == base functionality ==
-OBJ =	$(BIN)timeout.o \
-			$(BIN)peer.o \
-			$(BIN)relay.o \
-			$(BIN)dhm.o \
-			$(BIN)fmgr.o
-
 # target file and install directory
 OFILE = libuttu
-IDIR  = ./build/exe
+IDIR  = ./build/exe/
+
+SRC = $(wildcard src/*.cpp)
+HDR = $(wildcard inc/*.hpp)
+
+OBJ:
+	$(foreach f,$(SRC), \
+		$(CC) $(CF) $f -o $(BIN)$(lastword $(subst /, , $(basename $f))).o $(LINK); \
+		echo "Built | $f"; \
+	)
 
 # build rules
-linux: $(OBJ)
-	ar cr $(OFILE).a $^
+linux: OBJ
+	ar cr $(OFILE).a $(wildcard bin/*.o)
 	ranlib $(OFILE).a
-	mv *.a build/exe/
-	cp inc/* build/exe/inc/
-
-# functionality implementation files
-$(BIN)np.o: inc/protocols.hpp
-	$(CC) $(CFLAGS) src/np.cpp -o $@
-$(BIN)peer.o: inc/peer.hpp
-	$(CC) $(CFLAGS) src/peer.cpp -o $@
-$(BIN)relay.o: inc/relay.hpp
-	$(CC) $(CFLAGS) src/relay.cpp -o $@
-$(BIN)dhm.o: inc/dhm.hpp
-	$(CC) $(CFLAGS) src/dhm.cpp -o $@
-$(BIN)timeout.o: inc/timeout.hpp
-	$(CC) $(CFLAGS) src/timeout.cpp -o $@
-$(BIN)fmgr.o: inc/flags.hpp
-	$(CC) $(CFLAGS) src/fmgr.cpp -o $@
+	mv *.a $(IDIR)
+	cp inc/* $(IDIR)inc/
 
 clean:
 	rm -f build/bin/*.o
