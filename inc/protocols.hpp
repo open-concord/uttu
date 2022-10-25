@@ -2,17 +2,6 @@
 
 #include <string>
 
-#ifdef __linux__ // linux
-#include <sys/socket.h> // duh
-#include <sys/types.h> // needed by socket.h
-#include <netinet/in.h> // internet socket protocol
-#include <strings.h> // bzero
-#include <unistd.h> // close, accept, etc
-#include <arpa/inet.h> // needed for ip ID
-#include <netdb.h> // gethostbyname
-#include <poll.h> // ppoll & poll
-#endif
-
 /** extendable formatting */
 struct np {
   int sockfd = -1;

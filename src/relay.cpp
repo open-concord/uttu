@@ -4,6 +4,10 @@
 #include <thread>
 #include <stdexcept>
 
+#include <poll.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+
 void Relay::_Lazy(unsigned int life) {
   while(!Flags.Get(Relay::CLOSE, 1) || Flags.Get(Relay::LAZY, 1)) {
     struct pollfd pfds[1];

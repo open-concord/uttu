@@ -3,6 +3,8 @@
 #include "../inc/debug.hpp"
 
 #include <iostream>
+#include <poll.h>
+#include <sys/types.h>
 
 /** == status == */
 
