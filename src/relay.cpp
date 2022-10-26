@@ -94,7 +94,7 @@ Relay::Relay(
   np& _net,
   unsigned short int r_port,
   unsigned int timeout,
-  unsigned short _queueL
+  unsigned short int _queueL
 ) : Peer(_net, timeout), queueL(_queueL) {  
   this->Port(r_port);
   this->Flags.Reserve(0, 4);

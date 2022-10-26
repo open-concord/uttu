@@ -28,7 +28,7 @@ struct Relay : public Peer {
       np& _net,
 			unsigned short int r_port,
 			unsigned int timeout,
-			unsigned short _queul
+			unsigned short int _queul
     );
 };
 

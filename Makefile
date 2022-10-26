@@ -26,7 +26,7 @@ OBJ:
 
 # build rules
 linux: OBJ
-	ar cr $(OFILE).a $(wildcard bin/*.o)
+	ar cr $(OFILE).a $(wildcard $(BIN)*.o)
 	ranlib $(OFILE).a
 	mv *.a $(IDIR)
 	cp inc/* $(IDIR)inc/
